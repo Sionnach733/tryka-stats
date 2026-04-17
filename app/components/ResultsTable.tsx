@@ -47,10 +47,14 @@ export default function ResultsTable({ hits }: { hits: SearchHit[] }) {
               <td className="px-3 py-2">{hit.age_group ?? "—"}</td>
               <td className="px-3 py-2">{displayGender(hit.gender)}</td>
               <td className="px-3 py-2 text-right tabular-nums">
-                {hit.rank_overall ?? "—"}
+                {hit.rank_overall != null
+                  ? `${hit.rank_overall}/${hit.total_gender}`
+                  : "—"}
               </td>
               <td className="px-3 py-2 text-right tabular-nums">
-                {hit.rank_age_group ?? "—"}
+                {hit.rank_age_group != null
+                  ? `${hit.rank_age_group}/${hit.total_age_group}`
+                  : "—"}
               </td>
               <td className="px-3 py-2 text-right tabular-nums">
                 {hit.overall_time ?? "—"}

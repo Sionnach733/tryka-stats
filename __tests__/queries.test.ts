@@ -57,6 +57,16 @@ describe("searchAthletes", () => {
     expect(match).toBeDefined();
   });
 
+  it("includes totals that are at least as large as the rank", () => {
+    const hits = searchAthletes("Luttrell");
+    const hit = hits.find((h) => h.id === 20953);
+    expect(hit).toBeDefined();
+    expect(hit!.total_gender).toEqual(expect.any(Number));
+    expect(hit!.total_age_group).toEqual(expect.any(Number));
+    expect(hit!.rank_overall).toBeLessThanOrEqual(hit!.total_gender!);
+    expect(hit!.rank_age_group).toBeLessThanOrEqual(hit!.total_age_group!);
+  });
+
   it("returns empty array for a name that doesn't exist", () => {
     expect(searchAthletes("ZZZZNONEXISTENT")).toEqual([]);
   });
