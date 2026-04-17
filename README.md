@@ -1,6 +1,6 @@
 # tryka-stats
 
-A Next.js webapp that lets athletes search and analyse their results from [Tryka](https://tryka.r.mikatiming.com/) obstacle-course races. It reads the SQLite database produced by [`tryka-scraper`](../tryka-scraper) and provides:
+A Next.js webapp that lets athletes search and analyse their results from [Tryka](https://tryka.r.mikatiming.com/) races. It reads the SQLite database produced by [`tryka-scraper`](../tryka-scraper) and provides:
 
 - **Athlete search** — search by name (partial or full). Matches solo athletes and team members in doubles/relay events.
 - **Results overview** — lists every event an athlete participated in with race name, division, age group, gender, overall rank, and finish time.
