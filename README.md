@@ -27,7 +27,7 @@ The app reads `tryka.db` from the sibling `tryka-scraper` directory by default. 
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) and search by athlete name (e.g. `Breen` or `Breen, Conor`). Click a row to see the full split breakdown.
+Open [http://localhost:3000](http://localhost:3000) and search by athlete name (e.g. `Bent` or `Sinead Bent`). Click a row to see the full split breakdown.
 
 ## Test
 

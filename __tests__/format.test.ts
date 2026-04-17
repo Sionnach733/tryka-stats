@@ -3,13 +3,13 @@ import { parseMembers, displayMembers, displayGender } from "@/lib/format";
 
 describe("parseMembers", () => {
   it("parses a solo athlete", () => {
-    expect(parseMembers('["Breen, Conor"]')).toEqual(["Breen, Conor"]);
+    expect(parseMembers('["Conor Breen"]')).toEqual(["Conor Breen"]);
   });
 
   it("parses a team with multiple members", () => {
-    expect(parseMembers('["Smith, Alice", "Jones, Bob"]')).toEqual([
-      "Smith, Alice",
-      "Jones, Bob",
+    expect(parseMembers('["Alice Smith", "Bob Jones"]')).toEqual([
+      "Alice Smith",
+      "Bob Jones",
     ]);
   });
 

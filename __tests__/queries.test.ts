@@ -60,7 +60,7 @@ describe("getResult", () => {
     const result = getResult(15079);
     expect(result).toBeDefined();
     expect(result!.race_name).toBe("DUBLIN AUTUMN RACE 1");
-    expect(result!.members).toContain("Breen, Conor");
+    expect(result!.members).toContain("Conor Breen");
     expect(result!.overall_time).toBe("00:44:35");
     expect(result!.gender).toBe("M");
     expect(result!.age_group).toBe("35 - 39");
