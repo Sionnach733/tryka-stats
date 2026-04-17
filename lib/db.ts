@@ -12,8 +12,22 @@ function open(): Database.Database {
   return new Database(path, { readonly: true, fileMustExist: true });
 }
 
+function normalizeSearch(s: string): string {
+  return s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // strip diacritics
+    .replace(/[''`]/g, " ")         // replace apostrophes with space
+    .replace(/\s+/g, " ");          // collapse whitespace
+}
+
+function initDb(): Database.Database {
+  const conn = open();
+  conn.function("normalize_search", normalizeSearch);
+  return conn;
+}
+
 // Reuse a single connection across hot reloads in dev.
-export const db: Database.Database = global.__trykaDb ?? open();
+export const db: Database.Database = global.__trykaDb ?? initDb();
 if (process.env.NODE_ENV !== "production") {
   global.__trykaDb = db;
 }

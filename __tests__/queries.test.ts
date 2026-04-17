@@ -33,6 +33,30 @@ describe("searchAthletes", () => {
     expect(searchAthletes("   ")).toEqual([]);
   });
 
+  it("matches names with diacritics when searching without them", () => {
+    const hits = searchAthletes("Ciaran");
+    const match = hits.find((h) => h.members.includes("Ciarán"));
+    expect(match).toBeDefined();
+  });
+
+  it("matches names with diacritics when searching with them", () => {
+    const hits = searchAthletes("Ciarán");
+    const match = hits.find((h) => h.members.includes("Ciarán"));
+    expect(match).toBeDefined();
+  });
+
+  it("matches names with apostrophes when searching with a space instead", () => {
+    const hits = searchAthletes("O Shea");
+    const match = hits.find((h) => h.members.includes("O'Shea"));
+    expect(match).toBeDefined();
+  });
+
+  it("matches names with apostrophes when searching with the apostrophe", () => {
+    const hits = searchAthletes("O'Shea");
+    const match = hits.find((h) => h.members.includes("O'Shea"));
+    expect(match).toBeDefined();
+  });
+
   it("returns empty array for a name that doesn't exist", () => {
     expect(searchAthletes("ZZZZNONEXISTENT")).toEqual([]);
   });

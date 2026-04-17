@@ -50,7 +50,7 @@ const searchStmt = db.prepare<[string], SearchHit>(`
          e.race_name, e.division
   FROM results r
   JOIN events e ON r.event_id = e.id
-  WHERE LOWER(r.members) LIKE LOWER('%' || ? || '%')
+  WHERE LOWER(normalize_search(r.members)) LIKE LOWER('%' || normalize_search(?) || '%')
   ORDER BY e.race_name, r.rank_overall
   LIMIT 200
 `);
