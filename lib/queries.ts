@@ -1,0 +1,98 @@
+import { db } from "./db";
+
+export type SearchHit = {
+  id: number;
+  members: string;
+  age_group: string | null;
+  gender: string | null;
+  overall_time: string | null;
+  rank_overall: number | null;
+  rank_age_group: number | null;
+  race_name: string;
+  division: string;
+};
+
+export type ResultDetail = {
+  id: number;
+  idp: string;
+  members: string;
+  bib_number: string | null;
+  gym_affiliate: string | null;
+  age_group: string | null;
+  gender: string | null;
+  rank_overall: number | null;
+  rank_age_group: number | null;
+  league_points: number | null;
+  overall_time: string | null;
+  penalty: string | null;
+  bonus: string | null;
+  disqual_reason: string | null;
+  race_name: string;
+  division: string;
+};
+
+export type RefinedSplit = {
+  split_name: string;
+  time: string | null;
+  place: number | null;
+};
+
+export type RawSplit = {
+  split_name: string;
+  time_of_day: string | null;
+  time: string | null;
+  diff: string | null;
+};
+
+const searchStmt = db.prepare<[string], SearchHit>(`
+  SELECT r.id, r.members, r.age_group, r.gender, r.overall_time,
+         r.rank_overall, r.rank_age_group,
+         e.race_name, e.division
+  FROM results r
+  JOIN events e ON r.event_id = e.id
+  WHERE LOWER(r.members) LIKE LOWER('%' || ? || '%')
+  ORDER BY e.race_name, r.rank_overall
+  LIMIT 200
+`);
+
+const detailStmt = db.prepare<[number], ResultDetail>(`
+  SELECT r.id, r.idp, r.members, r.bib_number, r.gym_affiliate, r.age_group,
+         r.gender, r.rank_overall, r.rank_age_group, r.league_points,
+         r.overall_time, r.penalty, r.bonus, r.disqual_reason,
+         e.race_name, e.division
+  FROM results r
+  JOIN events e ON r.event_id = e.id
+  WHERE r.id = ?
+`);
+
+const refinedStmt = db.prepare<[number], RefinedSplit>(`
+  SELECT split_name, time, place
+  FROM refined_splits
+  WHERE result_id = ?
+  ORDER BY split_order
+`);
+
+const rawStmt = db.prepare<[number], RawSplit>(`
+  SELECT split_name, time_of_day, time, diff
+  FROM raw_splits
+  WHERE result_id = ?
+  ORDER BY split_order
+`);
+
+export function searchAthletes(query: string): SearchHit[] {
+  const q = query.trim();
+  if (!q) return [];
+  return searchStmt.all(q);
+}
+
+export function getResult(id: number): ResultDetail | undefined {
+  return detailStmt.get(id);
+}
+
+export function getRefinedSplits(resultId: number): RefinedSplit[] {
+  return refinedStmt.all(resultId);
+}
+
+export function getRawSplits(resultId: number): RawSplit[] {
+  return rawStmt.all(resultId);
+}
