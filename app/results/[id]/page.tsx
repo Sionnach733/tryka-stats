@@ -81,7 +81,7 @@ export default async function ResultPage({ params, searchParams }: { params: Par
         )}
       </section>
 
-      <SummaryTiles refined={refined} division={result.division} />
+      <SummaryTiles refined={refined} division={result.division} overallTime={result.overall_time} />
 
       <ResultTabs
         workoutContent={
@@ -178,9 +178,11 @@ const PACE_DISTANCES: Record<string, number> = {
 function SummaryTiles({
   refined,
   division,
+  overallTime,
 }: {
   refined: RefinedSplit[];
   division: string;
+  overallTime: string | null;
 }) {
   const byName = new Map(refined.map((s) => [s.split_name, s]));
 
@@ -204,8 +206,14 @@ function SummaryTiles({
   if (distanceKm && runTotalSecs) {
     tiles.push({ label: "Pace", value: formatPace(runTotalSecs, distanceKm) });
   }
+  const overallSecs = parseTime(overallTime);
+
   if (workoutSecs > 0) {
     tiles.push({ label: "Workout Total", value: formatMmSs(workoutSecs) });
+    if (overallSecs && overallSecs > 0) {
+      const ratio = (workoutSecs / overallSecs) * 100;
+      tiles.push({ label: "Workout Ratio", value: `${ratio.toFixed(1)}%` });
+    }
   }
   if (tryZone) {
     tiles.push({ label: "TRY Zone", value: tryZone });
@@ -214,16 +222,16 @@ function SummaryTiles({
   if (tiles.length === 0) return null;
 
   return (
-    <section className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+    <section className="grid grid-cols-2 gap-3 sm:grid-cols-5">
       {tiles.map((t) => (
         <div
           key={t.label}
-          className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+          className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 shadow-sm dark:border-slate-800 dark:bg-slate-900"
         >
           <div className="text-xs uppercase tracking-wide text-slate-500">
             {t.label}
           </div>
-          <div className="mt-1 text-xl font-semibold tabular-nums">
+          <div className="mt-1 text-lg font-semibold tabular-nums">
             {t.value}
           </div>
         </div>
