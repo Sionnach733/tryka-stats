@@ -16,7 +16,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/" className="text-xl font-semibold tracking-tight">
               Tryka Stats
             </Link>
-            <span className="text-sm text-slate-500">Athlete results explorer</span>
           </header>
           <main>{children}</main>
         </div>
