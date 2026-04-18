@@ -4,10 +4,13 @@ import {
   getRawSplits,
   getRefinedSplits,
   getResult,
+  getStationFieldTimes,
 } from "@/lib/queries";
 import { displayGender, displayMembers, parseMembers, parseTime, formatMmSs, formatPace } from "@/lib/format";
 import type { RefinedSplit } from "@/lib/queries";
 import ResultTabs from "@/app/components/ResultTabs";
+import StationsGrid from "@/app/components/StationsGrid";
+import type { StationData } from "@/app/components/StationsGrid";
 
 type Params = Promise<{ id: string }>;
 type SearchParams = Promise<{ q?: string }>;
@@ -24,6 +27,8 @@ export default async function ResultPage({ params, searchParams }: { params: Par
   const refined = getRefinedSplits(id);
   const raw = getRawSplits(id);
   const members = parseMembers(result.members);
+
+  const stationData = buildStationData(refined, result.event_id, result.gender);
 
   return (
     <div className="space-y-8">
@@ -107,6 +112,7 @@ export default async function ResultPage({ params, searchParams }: { params: Par
             numericCols={[1, 2, 3]}
           />
         }
+        stationsContent={<StationsGrid stations={stationData} />}
       />
     </div>
   );
@@ -238,6 +244,81 @@ function SummaryTiles({
       ))}
     </section>
   );
+}
+
+/** Minimum realistic times per station (seconds). Times faster than these are outliers. */
+const STATION_MIN_TIMES: Record<string, number> = {
+  "SkiErg": 180,           // 03:00
+  "KB Farmers Carry": 30,  // 00:30
+  "Ramfit Thrusters": 60,  // 01:00
+  "Sled Push": 40,         // 00:40
+  "Sled Pull": 60,         // 01:00
+  "Rowing": 180,           // 03:00
+  "Lunges": 60,            // 01:00
+  "Burpees": 60,           // 01:00
+};
+
+function buildStationData(
+  refined: RefinedSplit[],
+  eventId: number,
+  gender: string | null,
+): StationData[] {
+  if (!gender) return [];
+
+  const fieldRows = getStationFieldTimes(eventId, gender);
+
+  // Group field times by station, parsed to seconds, filtering outliers
+  const fieldByStation = new Map<string, number[]>();
+  for (const row of fieldRows) {
+    const secs = parseTime(row.time);
+    if (secs == null) continue;
+    const minTime = STATION_MIN_TIMES[row.split_name] ?? 0;
+    if (secs < minTime) continue;
+    let arr = fieldByStation.get(row.split_name);
+    if (!arr) {
+      arr = [];
+      fieldByStation.set(row.split_name, arr);
+    }
+    arr.push(secs);
+  }
+
+  // Compute shared x-axis range across all stations
+  let globalMin = Infinity;
+  let globalMax = -Infinity;
+  for (const times of fieldByStation.values()) {
+    if (times.length === 0) continue;
+    globalMin = Math.min(globalMin, times[0]);
+    globalMax = Math.max(globalMax, times[times.length - 1]);
+  }
+  if (!isFinite(globalMin)) {
+    globalMin = 0;
+    globalMax = 1;
+  }
+
+  const athleteSplits = new Map(refined.map((s) => [s.split_name, s]));
+
+  return WORKOUT_STATIONS.map((station) => {
+    const split = athleteSplits.get(station);
+    const timeSecs = parseTime(split?.time);
+    const rank = split?.place ?? null;
+    const fieldTimes = fieldByStation.get(station) ?? [];
+    const totalCompetitors = fieldTimes.length;
+    const percentile =
+      rank != null && totalCompetitors > 0
+        ? (rank / totalCompetitors) * 100
+        : null;
+
+    return {
+      station,
+      time: timeSecs,
+      rank,
+      totalCompetitors,
+      percentile,
+      fieldTimes,
+      xMin: globalMin,
+      xMax: globalMax,
+    };
+  });
 }
 
 function SplitsTable({

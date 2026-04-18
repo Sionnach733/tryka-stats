@@ -1,17 +1,41 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
-type Tab = "workout" | "splits";
+type Tab = "workout" | "splits" | "stations";
+
+const VALID_TABS = new Set<Tab>(["workout", "splits", "stations"]);
+
+function parseTab(value: string | null): Tab {
+  return value && VALID_TABS.has(value as Tab) ? (value as Tab) : "workout";
+}
 
 export default function ResultTabs({
   workoutContent,
   splitsContent,
+  stationsContent,
 }: {
   workoutContent: React.ReactNode;
   splitsContent: React.ReactNode;
+  stationsContent: React.ReactNode;
 }) {
-  const [active, setActive] = useState<Tab>("workout");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const [active, setActive] = useState<Tab>(parseTab(searchParams.get("tab")));
+
+  function switchTab(tab: Tab) {
+    setActive(tab);
+    const params = new URLSearchParams(searchParams.toString());
+    if (tab === "workout") {
+      params.delete("tab");
+    } else {
+      params.set("tab", tab);
+    }
+    const query = params.toString();
+    router.replace(`${pathname}${query ? `?${query}` : ""}`, { scroll: false });
+  }
 
   return (
     <div>
@@ -19,16 +43,25 @@ export default function ResultTabs({
         <TabButton
           label="Workout Result"
           active={active === "workout"}
-          onClick={() => setActive("workout")}
+          onClick={() => switchTab("workout")}
         />
         <TabButton
           label="Splits"
           active={active === "splits"}
-          onClick={() => setActive("splits")}
+          onClick={() => switchTab("splits")}
+        />
+        <TabButton
+          label="Stations"
+          active={active === "stations"}
+          onClick={() => switchTab("stations")}
         />
       </div>
       <div className="mt-4">
-        {active === "workout" ? workoutContent : splitsContent}
+        {active === "stations"
+          ? stationsContent
+          : active === "splits"
+            ? splitsContent
+            : workoutContent}
       </div>
     </div>
   );

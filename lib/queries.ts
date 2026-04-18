@@ -17,6 +17,7 @@ export type SearchHit = {
 export type ResultDetail = {
   id: number;
   idp: string;
+  event_id: number;
   members: string;
   bib_number: string | null;
   gym_affiliate: string | null;
@@ -46,6 +47,11 @@ export type RawSplit = {
   diff: string | null;
 };
 
+export type StationFieldRow = {
+  split_name: string;
+  time: string;
+};
+
 const searchStmt = db.prepare<[string], SearchHit>(`
   SELECT r.id, r.members, r.age_group, r.gender, r.overall_time,
          r.rank_overall, r.rank_age_group,
@@ -63,9 +69,9 @@ const searchStmt = db.prepare<[string], SearchHit>(`
 `);
 
 const detailStmt = db.prepare<[number], ResultDetail>(`
-  SELECT r.id, r.idp, r.members, r.bib_number, r.gym_affiliate, r.age_group,
-         r.gender, r.rank_overall, r.rank_age_group, r.league_points,
-         r.overall_time, r.penalty, r.bonus, r.disqual_reason,
+  SELECT r.id, r.idp, r.event_id, r.members, r.bib_number, r.gym_affiliate,
+         r.age_group, r.gender, r.rank_overall, r.rank_age_group,
+         r.league_points, r.overall_time, r.penalty, r.bonus, r.disqual_reason,
          e.race_name, e.division
   FROM results r
   JOIN events e ON r.event_id = e.id
@@ -102,4 +108,19 @@ export function getRefinedSplits(resultId: number): RefinedSplit[] {
 
 export function getRawSplits(resultId: number): RawSplit[] {
   return rawStmt.all(resultId);
+}
+
+const stationFieldStmt = db.prepare<[number, string], StationFieldRow>(`
+  SELECT rs.split_name, rs.time
+  FROM refined_splits rs
+  JOIN results r ON rs.result_id = r.id
+  WHERE r.event_id = ? AND r.gender = ?
+    AND rs.split_name IN ('SkiErg','KB Farmers Carry','Ramfit Thrusters',
+      'Sled Push','Sled Pull','Rowing','Lunges','Burpees')
+    AND rs.time IS NOT NULL
+  ORDER BY rs.split_name, rs.time
+`);
+
+export function getStationFieldTimes(eventId: number, gender: string): StationFieldRow[] {
+  return stationFieldStmt.all(eventId, gender);
 }
