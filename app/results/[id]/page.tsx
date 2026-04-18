@@ -7,6 +7,7 @@ import {
 } from "@/lib/queries";
 import { displayGender, displayMembers, parseMembers, parseTime, formatMmSs, formatPace } from "@/lib/format";
 import type { RefinedSplit } from "@/lib/queries";
+import ResultTabs from "@/app/components/ResultTabs";
 
 type Params = Promise<{ id: string }>;
 type SearchParams = Promise<{ q?: string }>;
@@ -82,32 +83,31 @@ export default async function ResultPage({ params, searchParams }: { params: Par
 
       <SummaryTiles refined={refined} division={result.division} />
 
-      <section>
-        <h2 className="mb-2 text-lg font-semibold">Workout Result</h2>
-        <SplitsTable
-          headers={["Split", "Time", "Place"]}
-          rows={refined.map((s) => [
-            s.split_name,
-            s.time ?? "—",
-            s.place != null ? String(s.place) : "—",
-          ])}
-          numericCols={[1, 2]}
-        />
-      </section>
-
-      <section>
-        <h2 className="mb-2 text-lg font-semibold">Splits</h2>
-        <SplitsTable
-          headers={["Split", "Time of Day", "Elapsed", "Diff"]}
-          rows={raw.map((s) => [
-            s.split_name,
-            s.time_of_day ?? "—",
-            s.time ?? "—",
-            s.diff ?? "—",
-          ])}
-          numericCols={[1, 2, 3]}
-        />
-      </section>
+      <ResultTabs
+        workoutContent={
+          <SplitsTable
+            headers={["Split", "Time", "Place"]}
+            rows={refined.map((s) => [
+              s.split_name,
+              s.time ?? "—",
+              s.place != null ? String(s.place) : "—",
+            ])}
+            numericCols={[1, 2]}
+          />
+        }
+        splitsContent={
+          <SplitsTable
+            headers={["Split", "Time of Day", "Elapsed", "Diff"]}
+            rows={raw.map((s) => [
+              s.split_name,
+              s.time_of_day ?? "—",
+              s.time ?? "—",
+              s.diff ?? "—",
+            ])}
+            numericCols={[1, 2, 3]}
+          />
+        }
+      />
     </div>
   );
 }
