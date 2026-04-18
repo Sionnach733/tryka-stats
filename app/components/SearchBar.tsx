@@ -83,7 +83,7 @@ export default function SearchBar({
         </p>
       )}
 
-      {hasSearched && !loading && <ResultsTable hits={hits} />}
+      {hasSearched && !loading && <ResultsTable hits={hits} query={value.trim()} />}
     </div>
   );
 }

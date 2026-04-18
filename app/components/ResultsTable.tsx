@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { SearchHit } from "@/lib/queries";
 import { displayGender, displayMembers, parseMembers } from "@/lib/format";
 
-export default function ResultsTable({ hits }: { hits: SearchHit[] }) {
+export default function ResultsTable({ hits, query }: { hits: SearchHit[]; query?: string }) {
   if (hits.length === 0) {
     return (
       <p className="mt-6 text-sm text-slate-500">
@@ -36,7 +36,7 @@ export default function ResultsTable({ hits }: { hits: SearchHit[] }) {
             >
               <td className="px-3 py-2 font-medium">
                 <Link
-                  href={`/results/${hit.id}`}
+                  href={`/results/${hit.id}${query ? `?q=${encodeURIComponent(query)}` : ""}`}
                   className="text-blue-700 hover:underline dark:text-blue-400"
                 >
                   {displayMembers(parseMembers(hit.members))}

@@ -8,9 +8,11 @@ import {
 import { displayGender, displayMembers, parseMembers } from "@/lib/format";
 
 type Params = Promise<{ id: string }>;
+type SearchParams = Promise<{ q?: string }>;
 
-export default async function ResultPage({ params }: { params: Params }) {
+export default async function ResultPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
   const { id: rawId } = await params;
+  const { q } = await searchParams;
   const id = Number(rawId);
   if (!Number.isFinite(id)) notFound();
 
@@ -24,7 +26,7 @@ export default async function ResultPage({ params }: { params: Params }) {
   return (
     <div className="space-y-8">
       <Link
-        href="/"
+        href={q ? `/?q=${encodeURIComponent(q)}` : "/"}
         className="text-sm text-blue-700 hover:underline dark:text-blue-400"
       >
         &larr; Back to search
