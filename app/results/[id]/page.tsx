@@ -5,7 +5,8 @@ import {
   getRefinedSplits,
   getResult,
 } from "@/lib/queries";
-import { displayGender, displayMembers, parseMembers } from "@/lib/format";
+import { displayGender, displayMembers, parseMembers, parseTime, formatMmSs, formatPace } from "@/lib/format";
+import type { RefinedSplit } from "@/lib/queries";
 
 type Params = Promise<{ id: string }>;
 type SearchParams = Promise<{ q?: string }>;
@@ -79,8 +80,10 @@ export default async function ResultPage({ params, searchParams }: { params: Par
         )}
       </section>
 
+      <SummaryTiles refined={refined} division={result.division} />
+
       <section>
-        <h2 className="mb-2 text-lg font-semibold">Refined splits</h2>
+        <h2 className="mb-2 text-lg font-semibold">Workout Result</h2>
         <SplitsTable
           headers={["Split", "Time", "Place"]}
           rows={refined.map((s) => [
@@ -93,7 +96,7 @@ export default async function ResultPage({ params, searchParams }: { params: Par
       </section>
 
       <section>
-        <h2 className="mb-2 text-lg font-semibold">Raw splits</h2>
+        <h2 className="mb-2 text-lg font-semibold">Splits</h2>
         <SplitsTable
           headers={["Split", "Time of Day", "Elapsed", "Diff"]}
           rows={raw.map((s) => [
@@ -147,6 +150,85 @@ function Notice({
       <div className="text-xs font-semibold uppercase tracking-wide">{label}</div>
       <div>{value}</div>
     </div>
+  );
+}
+
+const WORKOUT_STATIONS = [
+  "SkiErg",
+  "KB Farmers Carry",
+  "Ramfit Thrusters",
+  "Sled Push",
+  "Sled Pull",
+  "Rowing",
+  "Lunges",
+  "Burpees",
+];
+
+const PACE_DISTANCES: Record<string, number> = {
+  "TRYKA OPEN 800": 6.4,
+  "TRYKA DOUBLES 800": 6.4,
+  "TRYKA RELAY": 6.4,
+  "TRYKA PRO": 6.4,
+  "TRYKA PRO DOUBLES": 6.4,
+  "TRYKA DOUBLES PRO": 6.4,
+  "TRYKA OPEN 500": 4,
+  "TRYKA DOUBLES 500": 4,
+};
+
+function SummaryTiles({
+  refined,
+  division,
+}: {
+  refined: RefinedSplit[];
+  division: string;
+}) {
+  const byName = new Map(refined.map((s) => [s.split_name, s]));
+
+  const runTotal = byName.get("Run Total")?.time ?? null;
+  const runTotalSecs = parseTime(runTotal);
+
+  const workoutSecs = WORKOUT_STATIONS.reduce((sum, name) => {
+    const secs = parseTime(byName.get(name)?.time);
+    return secs != null ? sum + secs : sum;
+  }, 0);
+
+  const tryZone = byName.get("TRY Zone Total")?.time ?? null;
+
+  const distanceKm = PACE_DISTANCES[division];
+
+  const tiles: { label: string; value: string }[] = [];
+
+  if (runTotal) {
+    tiles.push({ label: "Run Total", value: runTotal });
+  }
+  if (distanceKm && runTotalSecs) {
+    tiles.push({ label: "Pace", value: formatPace(runTotalSecs, distanceKm) });
+  }
+  if (workoutSecs > 0) {
+    tiles.push({ label: "Workout Total", value: formatMmSs(workoutSecs) });
+  }
+  if (tryZone) {
+    tiles.push({ label: "TRY Zone", value: tryZone });
+  }
+
+  if (tiles.length === 0) return null;
+
+  return (
+    <section className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      {tiles.map((t) => (
+        <div
+          key={t.label}
+          className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+        >
+          <div className="text-xs uppercase tracking-wide text-slate-500">
+            {t.label}
+          </div>
+          <div className="mt-1 text-xl font-semibold tabular-nums">
+            {t.value}
+          </div>
+        </div>
+      ))}
+    </section>
   );
 }
 

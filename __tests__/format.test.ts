@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseMembers, displayMembers, displayGender } from "@/lib/format";
+import { parseMembers, displayMembers, displayGender, parseTime, formatMmSs, formatPace } from "@/lib/format";
 
 describe("parseMembers", () => {
   it("parses a solo athlete", () => {
@@ -55,4 +55,24 @@ describe("displayGender", () => {
   it("returns dash for null", () => expect(displayGender(null)).toBe("—"));
   it("returns dash for undefined", () => expect(displayGender(undefined)).toBe("—"));
   it("returns dash for unknown string", () => expect(displayGender("Z")).toBe("—"));
+});
+
+describe("parseTime", () => {
+  it("parses HH:MM:SS", () => expect(parseTime("00:15:42")).toBe(942));
+  it("parses MM:SS", () => expect(parseTime("04:10")).toBe(250));
+  it("returns null for null", () => expect(parseTime(null)).toBeNull());
+  it("returns null for undefined", () => expect(parseTime(undefined)).toBeNull());
+  it("returns null for empty string", () => expect(parseTime("")).toBeNull());
+  it("returns null for invalid format", () => expect(parseTime("abc")).toBeNull());
+});
+
+describe("formatMmSs", () => {
+  it("formats seconds as MM:SS", () => expect(formatMmSs(942)).toBe("15:42"));
+  it("pads minutes and seconds", () => expect(formatMmSs(65)).toBe("01:05"));
+  it("handles zero", () => expect(formatMmSs(0)).toBe("00:00"));
+});
+
+describe("formatPace", () => {
+  it("calculates pace for 6.4km", () => expect(formatPace(942, 6.4)).toBe("2:27 /km"));
+  it("calculates pace for 4km", () => expect(formatPace(942, 4)).toBe("3:56 /km"));
 });
