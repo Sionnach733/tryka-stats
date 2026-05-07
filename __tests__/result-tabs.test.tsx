@@ -18,6 +18,7 @@ const tabProps = {
   workoutContent: <div>Workout Table</div>,
   splitsContent: <div>Splits Table</div>,
   stationsContent: <div>Stations Grid</div>,
+  runsContent: <div>Runs Grid</div>,
 };
 
 describe("ResultTabs", () => {
@@ -55,6 +56,18 @@ describe("ResultTabs", () => {
     fireEvent.click(screen.getByRole("button", { name: "Workout Result" }));
 
     expect(screen.getByText("Workout Table")).toBeTruthy();
+    expect(screen.queryByText("Splits Table")).toBeNull();
+    expect(screen.queryByText("Stations Grid")).toBeNull();
+    expect(screen.queryByText("Runs Grid")).toBeNull();
+  });
+
+  it("switches to runs content when Runs tab is clicked", () => {
+    render(<ResultTabs {...tabProps} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Runs" }));
+
+    expect(screen.getByText("Runs Grid")).toBeTruthy();
+    expect(screen.queryByText("Workout Table")).toBeNull();
     expect(screen.queryByText("Splits Table")).toBeNull();
     expect(screen.queryByText("Stations Grid")).toBeNull();
   });

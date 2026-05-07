@@ -5,6 +5,7 @@ import {
   getRefinedSplits,
   getRawSplits,
   getStationFieldTimes,
+  getRunFieldTimes,
 } from "@/lib/queries";
 import { parseTime } from "@/lib/format";
 
@@ -114,10 +115,20 @@ describe("getResult", () => {
       "id", "idp", "members", "bib_number", "gym_affiliate",
       "age_group", "gender", "rank_overall", "rank_age_group",
       "league_points", "overall_time", "penalty", "bonus",
-      "disqual_reason", "race_name", "division",
+      "disqual_reason", "total_gender", "total_age_group",
+      "race_name", "division",
     ]) {
       expect(keys).toContain(k);
     }
+  });
+
+  it("includes sensible totals for gender and age group", () => {
+    const result = getResult(15079)!;
+    expect(result.total_gender).toBeGreaterThan(0);
+    expect(result.total_age_group).toBeGreaterThan(0);
+    expect(result.rank_overall).toBeLessThanOrEqual(result.total_gender!);
+    expect(result.rank_age_group).toBeLessThanOrEqual(result.total_age_group!);
+    expect(result.total_age_group).toBeLessThanOrEqual(result.total_gender!);
   });
 });
 
@@ -181,6 +192,31 @@ describe("getStationFieldTimes", () => {
 
   it("returns empty array for non-existent event", () => {
     expect(getStationFieldTimes(999999999, "X")).toEqual([]);
+  });
+});
+
+describe("getRunFieldTimes", () => {
+  it("returns rows for a known event and gender", () => {
+    const rows = getRunFieldTimes(23, "X");
+    expect(rows.length).toBeGreaterThan(0);
+    expect(rows[0]).toHaveProperty("split_name");
+    expect(rows[0]).toHaveProperty("time");
+  });
+
+  it("includes all 8 running splits and TRY Zone Total", () => {
+    const rows = getRunFieldTimes(23, "X");
+    const names = new Set(rows.map((r) => r.split_name));
+    for (const name of [
+      "Running 1", "Running 2", "Running 3", "Running 4",
+      "Running 5", "Running 6", "Running 7", "Running 8",
+      "TRY Zone Total",
+    ]) {
+      expect(names.has(name)).toBe(true);
+    }
+  });
+
+  it("returns empty array for non-existent event", () => {
+    expect(getRunFieldTimes(999999999, "X")).toEqual([]);
   });
 });
 
