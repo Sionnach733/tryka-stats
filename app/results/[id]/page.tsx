@@ -246,18 +246,6 @@ function SummaryTiles({
   );
 }
 
-/** Minimum realistic times per station (seconds). Times faster than these are outliers. */
-const STATION_MIN_TIMES: Record<string, number> = {
-  "SkiErg": 180,           // 03:00
-  "KB Farmers Carry": 30,  // 00:30
-  "Ramfit Thrusters": 60,  // 01:00
-  "Sled Push": 40,         // 00:40
-  "Sled Pull": 60,         // 01:00
-  "Rowing": 180,           // 03:00
-  "Lunges": 60,            // 01:00
-  "Burpees": 60,           // 01:00
-};
-
 function buildStationData(
   refined: RefinedSplit[],
   eventId: number,
@@ -267,13 +255,11 @@ function buildStationData(
 
   const fieldRows = getStationFieldTimes(eventId, gender);
 
-  // Group field times by station, parsed to seconds, filtering outliers
+  // Group field times by station, parsed to seconds
   const fieldByStation = new Map<string, number[]>();
   for (const row of fieldRows) {
     const secs = parseTime(row.time);
     if (secs == null) continue;
-    const minTime = STATION_MIN_TIMES[row.split_name] ?? 0;
-    if (secs < minTime) continue;
     let arr = fieldByStation.get(row.split_name);
     if (!arr) {
       arr = [];
