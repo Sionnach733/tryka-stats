@@ -50,7 +50,7 @@ export default async function ResultPage({ params, searchParams }: { params: Par
         <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-3 lg:grid-cols-4">
           <Field label="Overall Time" value={result.overall_time} mono />
           <Field
-            label="Rank (M/W)"
+            label="Overall Rank"
             value={result.rank_overall != null
               ? `${result.rank_overall} of ${result.total_gender}`
               : null}
