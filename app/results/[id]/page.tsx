@@ -300,13 +300,19 @@ function buildStationData(
   return WORKOUT_STATIONS.map((station) => {
     const split = athleteSplits.get(station);
     const timeSecs = parseTime(split?.time);
-    const rank = split?.place ?? null;
     const fieldTimes = fieldByStation.get(station) ?? [];
     const totalCompetitors = fieldTimes.length;
-    const percentile =
-      rank != null && totalCompetitors > 0
-        ? (rank / totalCompetitors) * 100
-        : null;
+    // Compute rank and percentile from field times
+    let rank: number | null = null;
+    let percentile: number | null = null;
+    if (timeSecs != null && totalCompetitors > 0) {
+      let faster = 0;
+      for (const t of fieldTimes) {
+        if (t < timeSecs) faster++;
+      }
+      rank = faster + 1;
+      percentile = (rank / totalCompetitors) * 100;
+    }
 
     return {
       station,

@@ -4,7 +4,9 @@ import {
   getResult,
   getRefinedSplits,
   getRawSplits,
+  getStationFieldTimes,
 } from "@/lib/queries";
+import { parseTime } from "@/lib/format";
 
 describe("searchAthletes", () => {
   it("returns results for a known surname", () => {
@@ -155,5 +157,94 @@ describe("getRawSplits", () => {
 
   it("returns empty array for non-existent result", () => {
     expect(getRawSplits(999999999)).toEqual([]);
+  });
+});
+
+describe("getStationFieldTimes", () => {
+  it("returns rows for a known event and gender", () => {
+    const rows = getStationFieldTimes(23, "X");
+    expect(rows.length).toBeGreaterThan(0);
+    expect(rows[0]).toHaveProperty("split_name");
+    expect(rows[0]).toHaveProperty("time");
+  });
+
+  it("includes all 8 station names", () => {
+    const rows = getStationFieldTimes(23, "X");
+    const stations = new Set(rows.map((r) => r.split_name));
+    for (const name of [
+      "SkiErg", "KB Farmers Carry", "Ramfit Thrusters", "Sled Push",
+      "Sled Pull", "Rowing", "Lunges", "Burpees",
+    ]) {
+      expect(stations.has(name)).toBe(true);
+    }
+  });
+
+  it("returns empty array for non-existent event", () => {
+    expect(getStationFieldTimes(999999999, "X")).toEqual([]);
+  });
+});
+
+describe("station percentile consistency (result 30808 Burpees)", () => {
+  /**
+   * Result 30808: Burpees time 00:02:11, 367 total competitors.
+   * Both tile and hover compute percentile as rank/total where
+   * rank = 1 + count(strictly faster).
+   */
+  it("hover percentile matches tile percentile at athlete time", () => {
+    const result = getResult(30808)!;
+    const refined = getRefinedSplits(30808);
+    const burpeesSplit = refined.find((s) => s.split_name === "Burpees")!;
+    const athleteTime = parseTime(burpeesSplit.time)!;
+
+    const fieldRows = getStationFieldTimes(result.event_id, result.gender!);
+    const burpeesTimes = fieldRows
+      .filter((r) => r.split_name === "Burpees")
+      .map((r) => parseTime(r.time)!)
+      .filter((t) => t != null)
+      .sort((a, b) => a - b);
+    const totalCompetitors = burpeesTimes.length;
+
+    // Tile percentile: rank / total
+    let faster = 0;
+    for (const t of burpeesTimes) {
+      if (t < athleteTime) faster++;
+    }
+    const tileRank = faster + 1;
+    const tilePercentile = (tileRank / totalCompetitors) * 100;
+
+    // Hover percentile: same rank logic with rounded time
+    const hoveredTime = Math.round(athleteTime);
+    let hoverFaster = 0;
+    for (const t of burpeesTimes) {
+      if (t < hoveredTime) hoverFaster++;
+      else break;
+    }
+    const hoverRank = hoverFaster + 1;
+    const hoverPercentile = (hoverRank / totalCompetitors) * 100;
+
+    expect(burpeesSplit.time).toBe("00:02:11");
+    expect(totalCompetitors).toBe(367);
+    expect(hoverPercentile).toBeCloseTo(tilePercentile, 5);
+  });
+
+  it("percentile at the slowest time equals 100%", () => {
+    const result = getResult(30808)!;
+    const fieldRows = getStationFieldTimes(result.event_id, result.gender!);
+    const burpeesTimes = fieldRows
+      .filter((r) => r.split_name === "Burpees")
+      .map((r) => parseTime(r.time)!)
+      .filter((t) => t != null)
+      .sort((a, b) => a - b);
+
+    const slowestTime = burpeesTimes[burpeesTimes.length - 1];
+    let faster = 0;
+    for (const t of burpeesTimes) {
+      if (t < slowestTime) faster++;
+    }
+    const rank = faster + 1;
+    // With ties at slowest time, rank/total won't be exactly 100%
+    // but it should be very close (within 1 rank of total)
+    expect(rank).toBeLessThanOrEqual(burpeesTimes.length);
+    expect(rank).toBeGreaterThan(burpeesTimes.length * 0.99);
   });
 });

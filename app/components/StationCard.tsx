@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useState, useCallback } from "react";
 import { formatMmSs, computeKde } from "@/lib/format";
 
 export interface StationData {
@@ -74,11 +75,10 @@ function KdePlot({
   const range = xMax - xMin || 1;
   const svgW = 300;
   const svgH = 64;
-  const pad = 0;
 
-  // Build SVG path: area fill from baseline
-  const toX = (x: number) => pad + ((x - xMin) / range) * (svgW - 2 * pad);
+  const toX = (x: number) => ((x - xMin) / range) * svgW;
   const toY = (d: number) => svgH - (d / maxDensity) * svgH;
+  const fromX = (svgX: number) => xMin + (svgX / svgW) * range;
 
   const linePoints = points.map((p) => `${toX(p.x)},${toY(p.density)}`);
   const areaPath = `M${toX(xMin)},${svgH} L${linePoints.join(" L")} L${toX(xMax)},${svgH} Z`;
@@ -88,8 +88,36 @@ function KdePlot({
       ? toX(Math.min(Math.max(athleteTime, xMin), xMax))
       : null;
 
+  // Sort field times for percentile lookup
+  const sorted = [...fieldTimes].sort((a, b) => a - b);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [hover, setHover] = useState<{ svgX: number; time: number; pct: number } | null>(null);
+
+  const handlePointer = useCallback(
+    (clientX: number) => {
+      const el = containerRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const frac = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1);
+      const svgX = frac * svgW;
+      const time = Math.round(fromX(svgX));
+      // Count competitors strictly faster than hovered time to get rank
+      let faster = 0;
+      for (const t of sorted) {
+        if (t < time) faster++;
+        else break;
+      }
+      const rank = faster + 1;
+      const pct = (rank / sorted.length) * 100;
+      setHover({ svgX, time, pct });
+    },
+    [sorted, svgW, fromX],
+  );
+
   return (
     <div
+      ref={containerRef}
       className="mt-3"
       role="img"
       aria-label={
@@ -97,30 +125,58 @@ function KdePlot({
           ? `Distribution of ${fieldTimes.length} competitors, your time ${formatMmSs(athleteTime)}`
           : `Distribution of ${fieldTimes.length} competitors`
       }
+      onMouseMove={(e) => handlePointer(e.clientX)}
+      onMouseLeave={() => setHover(null)}
+      onTouchMove={(e) => handlePointer(e.touches[0].clientX)}
+      onTouchEnd={() => setHover(null)}
     >
-      <svg
-        viewBox={`0 0 ${svgW} ${svgH}`}
-        className="w-full"
-        preserveAspectRatio="none"
-        style={{ height: "4rem" }}
-      >
-        <path
-          d={areaPath}
-          className="fill-slate-200 dark:fill-slate-700"
-        />
-        {athleteX != null && (
-          <line
-            x1={athleteX}
-            y1={0}
-            x2={athleteX}
-            y2={svgH}
-            className="stroke-blue-600 dark:stroke-blue-400"
-            strokeWidth={2}
+      <div className="relative">
+        <svg
+          viewBox={`0 0 ${svgW} ${svgH}`}
+          className="w-full"
+          preserveAspectRatio="none"
+          style={{ height: "4rem" }}
+        >
+          <path
+            d={areaPath}
+            className="fill-slate-200 dark:fill-slate-700"
+          />
+          {athleteX != null && (
+            <line
+              x1={athleteX}
+              y1={0}
+              x2={athleteX}
+              y2={svgH}
+              className="stroke-blue-600 dark:stroke-blue-400"
+              strokeWidth={2}
+            >
+              <title>Your time: {formatMmSs(athleteTime!)}</title>
+            </line>
+          )}
+          {hover && (
+            <line
+              x1={hover.svgX}
+              y1={0}
+              x2={hover.svgX}
+              y2={svgH}
+              className="stroke-slate-400 dark:stroke-slate-500"
+              strokeWidth={1}
+              strokeDasharray="3 2"
+            />
+          )}
+        </svg>
+        {hover && (
+          <div
+            className="pointer-events-none absolute -top-10 z-10 rounded bg-slate-800 px-2 py-1 text-[11px] tabular-nums text-white shadow dark:bg-slate-200 dark:text-slate-900"
+            style={{
+              left: `${(hover.svgX / svgW) * 100}%`,
+              transform: "translateX(-50%)",
+            }}
           >
-            <title>Your time: {formatMmSs(athleteTime!)}</title>
-          </line>
+            {formatMmSs(hover.time)} · top {hover.pct.toFixed(1)}%
+          </div>
         )}
-      </svg>
+      </div>
       <div className="mt-1 flex justify-between text-[10px] tabular-nums text-slate-400">
         <span>{formatMmSs(xMin)}</span>
         <span>{formatMmSs(xMax)}</span>
