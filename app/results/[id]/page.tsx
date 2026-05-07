@@ -101,13 +101,12 @@ export default async function ResultPage({ params, searchParams }: { params: Par
       <ResultTabs
         workoutContent={
           <SplitsTable
-            headers={["Split", "Time", "Place"]}
+            headers={["Split", "Time"]}
             rows={refined.map((s) => [
               s.split_name,
               s.time ?? "—",
-              s.place != null ? String(s.place) : "—",
             ])}
-            numericCols={[1, 2]}
+            numericCols={[1]}
           />
         }
         splitsContent={
