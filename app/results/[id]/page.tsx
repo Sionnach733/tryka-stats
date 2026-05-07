@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -5,12 +6,15 @@ import {
   getRefinedSplits,
   getResult,
   getStationFieldTimes,
+  getRunFieldTimes,
 } from "@/lib/queries";
 import { displayGender, displayMembers, parseMembers, parseTime, formatMmSs, formatPace } from "@/lib/format";
 import type { RefinedSplit } from "@/lib/queries";
 import ResultTabs from "@/app/components/ResultTabs";
 import StationsGrid from "@/app/components/StationsGrid";
 import type { StationData } from "@/app/components/StationsGrid";
+import RunsGrid from "@/app/components/RunsGrid";
+import type { RunData } from "@/app/components/RunsGrid";
 
 type Params = Promise<{ id: string }>;
 type SearchParams = Promise<{ q?: string }>;
@@ -29,6 +33,7 @@ export default async function ResultPage({ params, searchParams }: { params: Par
   const members = parseMembers(result.members);
 
   const stationData = buildStationData(refined, result.event_id, result.gender);
+  const runData = buildRunData(refined, result.event_id, result.gender);
 
   return (
     <div className="space-y-8">
@@ -92,6 +97,7 @@ export default async function ResultPage({ params, searchParams }: { params: Par
 
       <SummaryTiles refined={refined} division={result.division} overallTime={result.overall_time} />
 
+      <Suspense>
       <ResultTabs
         workoutContent={
           <SplitsTable
@@ -117,7 +123,9 @@ export default async function ResultPage({ params, searchParams }: { params: Par
           />
         }
         stationsContent={<StationsGrid stations={stationData} />}
+        runsContent={<RunsGrid runs={runData} />}
       />
+      </Suspense>
     </div>
   );
 }
@@ -313,6 +321,73 @@ function buildStationData(
       fieldTimes,
       xMin: globalMin,
       xMax: globalMax,
+    };
+  });
+}
+
+const RUN_SPLITS = [
+  "Running 1",
+  "Running 2",
+  "Running 3",
+  "Running 4",
+  "Running 5",
+  "Running 6",
+  "Running 7",
+  "Running 8",
+  "TRY Zone Total",
+];
+
+function buildRunData(
+  refined: RefinedSplit[],
+  eventId: number,
+  gender: string | null,
+): RunData[] {
+  if (!gender) return [];
+
+  const fieldRows = getRunFieldTimes(eventId, gender);
+
+  const fieldByRun = new Map<string, number[]>();
+  for (const row of fieldRows) {
+    const secs = parseTime(row.time);
+    if (secs == null) continue;
+    let arr = fieldByRun.get(row.split_name);
+    if (!arr) {
+      arr = [];
+      fieldByRun.set(row.split_name, arr);
+    }
+    arr.push(secs);
+  }
+
+  const athleteSplits = new Map(refined.map((s) => [s.split_name, s]));
+
+  return RUN_SPLITS.map((run) => {
+    const split = athleteSplits.get(run);
+    const timeSecs = parseTime(split?.time);
+    const fieldTimes = fieldByRun.get(run) ?? [];
+    const xMin = fieldTimes.length > 0 ? fieldTimes[0] : 0;
+    const p99Idx = fieldTimes.length > 0 ? Math.ceil(fieldTimes.length * 0.99) - 1 : 0;
+    const xMax = fieldTimes.length > 0 ? fieldTimes[p99Idx] : 1;
+    const totalCompetitors = fieldTimes.length;
+    let rank: number | null = null;
+    let percentile: number | null = null;
+    if (timeSecs != null && totalCompetitors > 0) {
+      let faster = 0;
+      for (const t of fieldTimes) {
+        if (t < timeSecs) faster++;
+      }
+      rank = faster + 1;
+      percentile = (rank / totalCompetitors) * 100;
+    }
+
+    return {
+      run,
+      time: timeSecs,
+      rank,
+      totalCompetitors,
+      percentile,
+      fieldTimes,
+      xMin,
+      xMax,
     };
   });
 }

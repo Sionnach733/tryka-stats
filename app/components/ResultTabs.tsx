@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
-type Tab = "workout" | "splits" | "stations";
+type Tab = "workout" | "splits" | "stations" | "runs";
 
-const VALID_TABS = new Set<Tab>(["workout", "splits", "stations"]);
+const VALID_TABS = new Set<Tab>(["workout", "splits", "stations", "runs"]);
 
 function parseTab(value: string | null): Tab {
   return value && VALID_TABS.has(value as Tab) ? (value as Tab) : "workout";
@@ -15,10 +15,12 @@ export default function ResultTabs({
   workoutContent,
   splitsContent,
   stationsContent,
+  runsContent,
 }: {
   workoutContent: React.ReactNode;
   splitsContent: React.ReactNode;
   stationsContent: React.ReactNode;
+  runsContent: React.ReactNode;
 }) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -55,13 +57,20 @@ export default function ResultTabs({
           active={active === "stations"}
           onClick={() => switchTab("stations")}
         />
+        <TabButton
+          label="Runs"
+          active={active === "runs"}
+          onClick={() => switchTab("runs")}
+        />
       </div>
       <div className="mt-4">
         {active === "stations"
           ? stationsContent
-          : active === "splits"
-            ? splitsContent
-            : workoutContent}
+          : active === "runs"
+            ? runsContent
+            : active === "splits"
+              ? splitsContent
+              : workoutContent}
       </div>
     </div>
   );

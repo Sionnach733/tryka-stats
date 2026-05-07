@@ -131,3 +131,18 @@ const stationFieldStmt = db.prepare<[number, string], StationFieldRow>(`
 export function getStationFieldTimes(eventId: number, gender: string): StationFieldRow[] {
   return stationFieldStmt.all(eventId, gender);
 }
+
+const runFieldStmt = db.prepare<[number, string], StationFieldRow>(`
+  SELECT rs.split_name, rs.time
+  FROM refined_splits rs
+  JOIN results r ON rs.result_id = r.id
+  WHERE r.event_id = ? AND r.gender = ?
+    AND rs.split_name IN ('Running 1','Running 2','Running 3','Running 4',
+      'Running 5','Running 6','Running 7','Running 8','TRY Zone Total')
+    AND rs.time IS NOT NULL
+  ORDER BY rs.split_name, rs.time
+`);
+
+export function getRunFieldTimes(eventId: number, gender: string): StationFieldRow[] {
+  return runFieldStmt.all(eventId, gender);
+}
