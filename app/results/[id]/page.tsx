@@ -280,19 +280,6 @@ function buildStationData(
     arr.push(secs);
   }
 
-  // Compute shared x-axis range across all stations
-  let globalMin = Infinity;
-  let globalMax = -Infinity;
-  for (const times of fieldByStation.values()) {
-    if (times.length === 0) continue;
-    globalMin = Math.min(globalMin, times[0]);
-    globalMax = Math.max(globalMax, times[times.length - 1]);
-  }
-  if (!isFinite(globalMin)) {
-    globalMin = 0;
-    globalMax = 1;
-  }
-
   const athleteSplits = new Map(refined.map((s) => [s.split_name, s]));
 
   return WORKOUT_STATIONS.map((station) => {
@@ -300,6 +287,9 @@ function buildStationData(
     const timeSecs = parseTime(split?.time);
     const fieldTimes = fieldByStation.get(station) ?? [];
     const totalCompetitors = fieldTimes.length;
+    const xMin = fieldTimes.length > 0 ? fieldTimes[0] : 0;
+    const p99Idx = fieldTimes.length > 0 ? Math.ceil(fieldTimes.length * 0.99) - 1 : 0;
+    const xMax = fieldTimes.length > 0 ? fieldTimes[p99Idx] : 1;
     // Compute rank and percentile from field times
     let rank: number | null = null;
     let percentile: number | null = null;
@@ -319,8 +309,8 @@ function buildStationData(
       totalCompetitors,
       percentile,
       fieldTimes,
-      xMin: globalMin,
-      xMax: globalMax,
+      xMin,
+      xMax,
     };
   });
 }
