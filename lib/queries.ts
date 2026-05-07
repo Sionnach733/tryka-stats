@@ -30,6 +30,8 @@ export type ResultDetail = {
   penalty: string | null;
   bonus: string | null;
   disqual_reason: string | null;
+  total_gender: number | null;
+  total_age_group: number | null;
   race_name: string;
   division: string;
 };
@@ -72,6 +74,11 @@ const detailStmt = db.prepare<[number], ResultDetail>(`
   SELECT r.id, r.idp, r.event_id, r.members, r.bib_number, r.gym_affiliate,
          r.age_group, r.gender, r.rank_overall, r.rank_age_group,
          r.league_points, r.overall_time, r.penalty, r.bonus, r.disqual_reason,
+         (SELECT COUNT(*) FROM results r2
+          WHERE r2.event_id = r.event_id AND r2.gender = r.gender) AS total_gender,
+         (SELECT COUNT(*) FROM results r2 WHERE r2.event_id = r.event_id
+            AND r2.gender = r.gender
+            AND r2.age_group = r.age_group) AS total_age_group,
          e.race_name, e.division
   FROM results r
   JOIN events e ON r.event_id = e.id

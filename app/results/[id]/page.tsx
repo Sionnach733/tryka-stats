@@ -51,11 +51,15 @@ export default async function ResultPage({ params, searchParams }: { params: Par
           <Field label="Overall Time" value={result.overall_time} mono />
           <Field
             label="Rank (M/W)"
-            value={result.rank_overall?.toString() ?? null}
+            value={result.rank_overall != null
+              ? `${result.rank_overall} of ${result.total_gender}`
+              : null}
           />
           <Field
             label="Rank (AG)"
-            value={result.rank_age_group?.toString() ?? null}
+            value={result.rank_age_group != null
+              ? `${result.rank_age_group} of ${result.total_age_group}`
+              : null}
           />
           <Field label="Age Group" value={result.age_group} />
           <Field label="Gender" value={displayGender(result.gender)} />
