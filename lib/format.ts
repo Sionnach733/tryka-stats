@@ -71,6 +71,20 @@ export function computeKde(
   return points;
 }
 
+/** Format a time difference with sign prefix. Returns "+M:SS", "-M:SS", or "0:00". */
+export function formatDiff(seconds: number): string {
+  if (seconds === 0) return "0:00";
+  const sign = seconds > 0 ? "+" : "-";
+  const abs = Math.abs(seconds);
+  const h = Math.floor(abs / 3600);
+  const m = Math.floor((abs % 3600) / 60);
+  const s = Math.round(abs % 60);
+  if (h > 0) {
+    return `${sign}${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  }
+  return `${sign}${m}:${String(s).padStart(2, "0")}`;
+}
+
 /** Format a pace as "M:SS /km". */
 export function formatPace(totalSeconds: number, distanceKm: number): string {
   const paceSeconds = totalSeconds / distanceKm;

@@ -8,20 +8,25 @@ import {
   getStationFieldTimes,
   getRunFieldTimes,
 } from "@/lib/queries";
-import { displayGender, displayMembers, parseMembers, parseTime, formatMmSs, formatPace } from "@/lib/format";
+import { displayGender, displayMembers, parseMembers, parseTime, formatMmSs, formatPace, formatDiff } from "@/lib/format";
 import type { RefinedSplit } from "@/lib/queries";
+import { WORKOUT_STATIONS, PACE_DISTANCES, RUN_SPLITS } from "@/lib/constants";
 import ResultTabs from "@/app/components/ResultTabs";
 import StationsGrid from "@/app/components/StationsGrid";
 import type { StationData } from "@/app/components/StationsGrid";
 import RunsGrid from "@/app/components/RunsGrid";
 import type { RunData } from "@/app/components/RunsGrid";
+import CompareButton from "@/app/components/CompareButton";
+import ComparisonTiles from "@/app/components/ComparisonTiles";
+import type { ComparisonTotals } from "@/app/components/ComparisonTiles";
+import ComparisonSplits from "@/app/components/ComparisonSplits";
 
 type Params = Promise<{ id: string }>;
-type SearchParams = Promise<{ q?: string }>;
+type SearchParams = Promise<{ q?: string; compare?: string }>;
 
 export default async function ResultPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
   const { id: rawId } = await params;
-  const { q } = await searchParams;
+  const { q, compare } = await searchParams;
   const id = Number(rawId);
   if (!Number.isFinite(id)) notFound();
 
@@ -35,79 +40,95 @@ export default async function ResultPage({ params, searchParams }: { params: Par
   const stationData = buildStationData(refined, result.event_id, result.gender);
   const runData = buildRunData(refined, result.event_id, result.gender);
 
+  // Comparison data
+  const compareId = compare ? Number(compare) : null;
+  const compareResult = compareId && Number.isFinite(compareId) ? getResult(compareId) : undefined;
+  const compareRefined = compareResult ? getRefinedSplits(compareId!) : [];
+  const isCompareMode = !!compareResult;
+
+  let comparisonTotals: { primary: ComparisonTotals; secondary: ComparisonTotals } | null = null;
+  let compareSplits: { splitName: string; primaryTime: number | null; secondaryTime: number | null }[] = [];
+
+  if (isCompareMode) {
+    const primaryTotals = { ...buildComparisonTotals(refined), overallTime: result.overall_time };
+    const secondaryTotals = { ...buildComparisonTotals(compareRefined), overallTime: compareResult.overall_time };
+    comparisonTotals = { primary: primaryTotals, secondary: secondaryTotals };
+
+    // Align splits by order from primary, then add any extras from secondary
+    const excludeFromCompare = new Set(["Best Run Lap", "Run Total"]);
+    const secondaryByName = new Map(compareRefined.map((s) => [s.split_name, s]));
+    const seen = new Set<string>();
+    for (const s of refined) {
+      seen.add(s.split_name);
+      if (excludeFromCompare.has(s.split_name)) continue;
+      compareSplits.push({
+        splitName: s.split_name,
+        primaryTime: parseTime(s.time),
+        secondaryTime: parseTime(secondaryByName.get(s.split_name)?.time),
+      });
+    }
+    for (const s of compareRefined) {
+      if (!seen.has(s.split_name) && !excludeFromCompare.has(s.split_name)) {
+        compareSplits.push({
+          splitName: s.split_name,
+          primaryTime: null,
+          secondaryTime: parseTime(s.time),
+        });
+      }
+    }
+  }
+
+  const primaryName = displayMembers(members);
+  const compareName = compareResult ? displayMembers(parseMembers(compareResult.members)) : "";
+
   return (
     <div className="space-y-8">
-      <Link
-        href={q ? `/?q=${encodeURIComponent(q)}` : "/"}
-        className="text-sm text-blue-700 hover:underline dark:text-blue-400"
-      >
-        &larr; Back to search
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link
+          href={q ? `/?q=${encodeURIComponent(q)}` : "/"}
+          className="text-sm text-blue-700 hover:underline dark:text-blue-400"
+        >
+          &larr; Back to search
+        </Link>
+        <Suspense>
+          <CompareButton currentId={id} compareId={compareId} />
+        </Suspense>
+      </div>
 
-      <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {displayMembers(members)}
-        </h1>
-        <p className="mt-1 text-slate-600 dark:text-slate-400">
-          {result.race_name} &middot; {result.division}
-        </p>
-
-        <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-3 lg:grid-cols-4">
-          <Field label="Overall Time" value={result.overall_time} mono />
-          <Field
-            label="Overall Rank"
-            value={result.rank_overall != null
-              ? `${result.rank_overall} of ${result.total_gender}`
-              : null}
-          />
-          <Field
-            label="Rank (AG)"
-            value={result.rank_age_group != null
-              ? `${result.rank_age_group} of ${result.total_age_group}`
-              : null}
-          />
-          <Field label="Age Group" value={result.age_group} />
-          <Field label="Gender" value={displayGender(result.gender)} />
-          <Field label="Bib" value={result.bib_number} />
-          <Field label="Gym Affiliate" value={result.gym_affiliate} />
-          <Field
-            label="League Points"
-            value={result.league_points?.toString() ?? null}
-          />
-        </dl>
-
-        {(result.penalty || result.bonus || result.disqual_reason) && (
-          <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
-            {result.penalty && (
-              <Notice tone="warn" label="Penalty" value={result.penalty} />
-            )}
-            {result.bonus && (
-              <Notice tone="good" label="Bonus" value={result.bonus} />
-            )}
-            {result.disqual_reason && (
-              <Notice
-                tone="bad"
-                label="Disqualified"
-                value={result.disqual_reason}
-              />
-            )}
-          </div>
+      <div className={isCompareMode ? "grid grid-cols-1 gap-4 lg:grid-cols-2" : ""}>
+        <AthleteCard result={result} members={members} />
+        {isCompareMode && compareResult && (
+          <AthleteCard result={compareResult} members={parseMembers(compareResult.members)} />
         )}
-      </section>
+      </div>
 
-      <SummaryTiles refined={refined} division={result.division} overallTime={result.overall_time} />
+      {isCompareMode && comparisonTotals ? (
+        <ComparisonTiles primary={comparisonTotals.primary} secondary={comparisonTotals.secondary} />
+      ) : (
+        <SummaryTiles refined={refined} division={result.division} overallTime={result.overall_time} />
+      )}
 
       <Suspense>
       <ResultTabs
         workoutContent={
-          <SplitsTable
-            headers={["Split", "Time"]}
-            rows={refined.map((s) => [
-              s.split_name,
-              s.time ?? "—",
-            ])}
-            numericCols={[1]}
-          />
+          isCompareMode ? (
+            <ComparisonSplits
+              splits={compareSplits}
+              primaryName={primaryName}
+              primaryRace={`${result.race_name}`}
+              secondaryName={compareName}
+              secondaryRace={`${compareResult!.race_name}`}
+            />
+          ) : (
+            <SplitsTable
+              headers={["Split", "Time"]}
+              rows={refined.map((s) => [
+                s.split_name,
+                s.time ?? "—",
+              ])}
+              numericCols={[1]}
+            />
+          )
         }
         splitsContent={
           <SplitsTable
@@ -148,6 +169,87 @@ function Field({
   );
 }
 
+function AthleteCard({
+  result,
+  members,
+}: {
+  result: { race_name: string; division: string; overall_time: string | null; rank_overall: number | null; rank_age_group: number | null; age_group: string | null; gender: string | null; bib_number: string | null; gym_affiliate: string | null; league_points: number | null; total_gender: number | null; total_age_group: number | null; penalty: string | null; bonus: string | null; disqual_reason: string | null };
+  members: string[];
+}) {
+  return (
+    <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <h1 className="text-2xl font-semibold tracking-tight">
+        {displayMembers(members)}
+      </h1>
+      <p className="mt-1 text-slate-600 dark:text-slate-400">
+        {result.race_name} &middot; {result.division}
+      </p>
+
+      <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-3 lg:grid-cols-4">
+        <Field label="Overall Time" value={result.overall_time} mono />
+        <Field
+          label="Overall Rank"
+          value={result.rank_overall != null
+            ? `${result.rank_overall} of ${result.total_gender}`
+            : null}
+        />
+        <Field
+          label="Rank (AG)"
+          value={result.rank_age_group != null
+            ? `${result.rank_age_group} of ${result.total_age_group}`
+            : null}
+        />
+        <Field label="Age Group" value={result.age_group} />
+        <Field label="Gender" value={displayGender(result.gender)} />
+        <Field label="Bib" value={result.bib_number} />
+        <Field label="Gym Affiliate" value={result.gym_affiliate} />
+        <Field
+          label="League Points"
+          value={result.league_points?.toString() ?? null}
+        />
+      </dl>
+
+      {(result.penalty || result.bonus || result.disqual_reason) && (
+        <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
+          {result.penalty && (
+            <Notice tone="warn" label="Penalty" value={result.penalty} />
+          )}
+          {result.bonus && (
+            <Notice tone="good" label="Bonus" value={result.bonus} />
+          )}
+          {result.disqual_reason && (
+            <Notice
+              tone="bad"
+              label="Disqualified"
+              value={result.disqual_reason}
+            />
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function buildComparisonTotals(refined: RefinedSplit[]): ComparisonTotals {
+  const byName = new Map(refined.map((s) => [s.split_name, s]));
+  const runTotal = byName.get("Run Total")?.time ?? null;
+  const workoutSecs = WORKOUT_STATIONS.reduce((sum, name) => {
+    const secs = parseTime(byName.get(name)?.time);
+    return secs != null ? sum + secs : sum;
+  }, 0);
+  const tryZone = byName.get("TRY Zone Total")?.time ?? null;
+  // Find overall time from the last refined split or use a dedicated field
+  // We pass overall_time from the result, but here we work with refined splits
+  // Overall time comes from the result object, not refined splits
+  // So we compute workout total as MM:SS string
+  return {
+    overallTime: null, // Will be set from result object
+    runTotal,
+    workoutTotal: workoutSecs > 0 ? formatMmSs(workoutSecs) : null,
+    tryZone,
+  };
+}
+
 function Notice({
   tone,
   label,
@@ -170,27 +272,6 @@ function Notice({
   );
 }
 
-const WORKOUT_STATIONS = [
-  "SkiErg",
-  "KB Farmers Carry",
-  "Ramfit Thrusters",
-  "Sled Push",
-  "Sled Pull",
-  "Rowing",
-  "Lunges",
-  "Burpees",
-];
-
-const PACE_DISTANCES: Record<string, number> = {
-  "TRYKA OPEN 800": 6.4,
-  "TRYKA DOUBLES 800": 6.4,
-  "TRYKA RELAY": 6.4,
-  "TRYKA PRO": 6.4,
-  "TRYKA PRO DOUBLES": 6.4,
-  "TRYKA DOUBLES PRO": 6.4,
-  "TRYKA OPEN 500": 4,
-  "TRYKA DOUBLES 500": 4,
-};
 
 function SummaryTiles({
   refined,
@@ -314,17 +395,6 @@ function buildStationData(
   });
 }
 
-const RUN_SPLITS = [
-  "Running 1",
-  "Running 2",
-  "Running 3",
-  "Running 4",
-  "Running 5",
-  "Running 6",
-  "Running 7",
-  "Running 8",
-  "TRY Zone Total",
-];
 
 function buildRunData(
   refined: RefinedSplit[],
