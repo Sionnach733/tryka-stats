@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { formatDiff } from "@/lib/format";
+import { formatDiff, formatMmSs } from "@/lib/format";
 
 export interface CompareSplit {
   splitName: string;
@@ -54,10 +54,14 @@ export default function ComparisonChart({
     if (rowIdx >= 0 && rowIdx < splits.length) {
       const s = splits[rowIdx];
       const diff = diffs[rowIdx];
+      const lines = [s.splitName];
+      if (s.primaryTime != null) lines.push(`${primaryName}: ${formatMmSs(s.primaryTime)}`);
+      if (s.secondaryTime != null) lines.push(`${secondaryName}: ${formatMmSs(s.secondaryTime)}`);
+      if (s.primaryTime != null && s.secondaryTime != null) lines.push(`Diff: ${formatDiff(diff)}`);
       setTooltip({
         x: svgX,
         y: rowIdx * rowHeight,
-        text: `${s.splitName}\n${primaryName} vs ${secondaryName} : ${formatDiff(diff)}`,
+        text: lines.join("\n"),
       });
     } else {
       setTooltip(null);
@@ -202,29 +206,35 @@ export default function ComparisonChart({
         })}
 
         {/* Tooltip */}
-        {tooltip && (
-          <g>
-            <rect
-              x={Math.min(tooltip.x + 10, chartWidth - 180)}
-              y={Math.max(tooltip.y - 30, 0)}
-              width={200}
-              height={40}
-              rx={4}
-              className="fill-slate-800 dark:fill-slate-700"
-              opacity={0.9}
-            />
-            {tooltip.text.split("\n").map((line, i) => (
-              <text
-                key={i}
-                x={Math.min(tooltip.x + 18, chartWidth - 172)}
-                y={Math.max(tooltip.y - 30, 0) + 16 + i * 14}
-                className="fill-white text-[10px]"
-              >
-                {line}
-              </text>
-            ))}
-          </g>
-        )}
+        {tooltip && (() => {
+          const lines = tooltip.text.split("\n");
+          const tooltipH = 10 + lines.length * 16;
+          const tx = Math.min(tooltip.x + 10, chartWidth - 180);
+          const ty = Math.max(tooltip.y - tooltipH / 2, 0);
+          return (
+            <g>
+              <rect
+                x={tx}
+                y={ty}
+                width={200}
+                height={tooltipH}
+                rx={4}
+                className="fill-slate-800 dark:fill-slate-700"
+                opacity={0.9}
+              />
+              {lines.map((line, i) => (
+                <text
+                  key={i}
+                  x={tx + 8}
+                  y={ty + 16 + i * 16}
+                  className={`fill-white text-[10px] ${i === 0 ? "font-semibold" : ""}`}
+                >
+                  {line}
+                </text>
+              ))}
+            </g>
+          );
+        })()}
       </svg>
     </div>
   );
