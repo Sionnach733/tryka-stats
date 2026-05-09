@@ -53,11 +53,7 @@ export default function ComparisonTable({
           {rows.map((r) => (
             <tr key={r.splitName}>
               <td
-                className={`px-3 py-2 font-medium ${
-                  r.isRun
-                    ? "text-emerald-600 dark:text-emerald-400"
-                    : "text-orange-600 dark:text-orange-400"
-                }`}
+                className="px-3 py-2 font-medium text-slate-900 dark:text-white"
               >
                 {r.splitName}
               </td>
