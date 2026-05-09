@@ -29,5 +29,7 @@ export function GET(request: NextRequest) {
   if (q.length < 3 || q.length > 200) {
     return NextResponse.json([]);
   }
-  return NextResponse.json(searchAthletes(q));
+  return NextResponse.json(searchAthletes(q), {
+    headers: { "Cache-Control": "public, max-age=300, s-maxage=300" },
+  });
 }

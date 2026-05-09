@@ -21,6 +21,8 @@ import ComparisonTiles from "@/app/components/ComparisonTiles";
 import type { ComparisonTotals } from "@/app/components/ComparisonTiles";
 import ComparisonSplits from "@/app/components/ComparisonSplits";
 
+export const revalidate = 3600;
+
 type Params = Promise<{ id: string }>;
 type SearchParams = Promise<{ q?: string; compare?: string }>;
 

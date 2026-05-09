@@ -1,5 +1,3 @@
-"use client";
-
 import RunCard from "./RunCard";
 import type { RunData } from "./RunCard";
 

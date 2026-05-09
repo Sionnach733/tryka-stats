@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useMemo } from "react";
 import { formatMmSs, computeKde } from "@/lib/format";
 
 export interface RunData {
@@ -66,29 +66,33 @@ function KdePlot({
   xMin: number;
   xMax: number;
 }) {
-  const points = computeKde(fieldTimes, xMin, xMax, 100);
-  if (points.length === 0) return null;
-
-  const maxDensity = Math.max(...points.map((p) => p.density));
-  if (maxDensity === 0) return null;
-
-  const range = xMax - xMin || 1;
   const svgW = 300;
   const svgH = 64;
 
-  const toX = (x: number) => ((x - xMin) / range) * svgW;
-  const toY = (d: number) => svgH - (d / maxDensity) * svgH;
-  const fromX = (svgX: number) => xMin + (svgX / svgW) * range;
+  const points = useMemo(
+    () => computeKde(fieldTimes, xMin, xMax, 100),
+    [fieldTimes, xMin, xMax],
+  );
 
-  const linePoints = points.map((p) => `${toX(p.x)},${toY(p.density)}`);
-  const areaPath = `M${toX(xMin)},${svgH} L${linePoints.join(" L")} L${toX(xMax)},${svgH} Z`;
+  const sorted = useMemo(
+    () => [...fieldTimes].sort((a, b) => a - b),
+    [fieldTimes],
+  );
 
-  const athleteX =
-    athleteTime != null
-      ? toX(Math.min(Math.max(athleteTime, xMin), xMax))
-      : null;
+  const { maxDensity, range, toX, toY, fromX, areaPath, athleteX } = useMemo(() => {
+    const maxD = Math.max(...points.map((p) => p.density));
+    const r = xMax - xMin || 1;
+    const tx = (x: number) => ((x - xMin) / r) * svgW;
+    const ty = (d: number) => svgH - (d / maxD) * svgH;
+    const fx = (svgX: number) => xMin + (svgX / svgW) * r;
+    const linePoints = points.map((p) => `${tx(p.x)},${ty(p.density)}`);
+    const ap = `M${tx(xMin)},${svgH} L${linePoints.join(" L")} L${tx(xMax)},${svgH} Z`;
+    const ax = athleteTime != null ? tx(Math.min(Math.max(athleteTime, xMin), xMax)) : null;
+    return { maxDensity: maxD, range: r, toX: tx, toY: ty, fromX: fx, areaPath: ap, athleteX: ax };
+  }, [points, xMin, xMax, athleteTime]);
 
-  const sorted = [...fieldTimes].sort((a, b) => a - b);
+  if (points.length === 0) return null;
+  if (maxDensity === 0) return null;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState<{ svgX: number; time: number; pct: number } | null>(null);

@@ -55,16 +55,20 @@ export type StationFieldRow = {
 };
 
 const searchStmt = db.prepare<[string], SearchHit>(`
+  WITH totals AS (
+    SELECT event_id, gender, age_group,
+           MAX(rank_overall)   AS total_gender,
+           MAX(rank_age_group) AS total_age_group
+    FROM results
+    GROUP BY event_id, gender, age_group
+  )
   SELECT r.id, r.members, r.age_group, r.gender, r.overall_time,
          r.rank_overall, r.rank_age_group,
-         (SELECT MAX(r2.rank_overall) FROM results r2
-          WHERE r2.event_id = r.event_id AND r2.gender = r.gender) AS total_gender,
-         (SELECT MAX(r2.rank_age_group) FROM results r2
-          WHERE r2.event_id = r.event_id AND r2.gender = r.gender
-            AND r2.age_group = r.age_group) AS total_age_group,
+         t.total_gender, t.total_age_group,
          e.race_name, e.division
   FROM results r
   JOIN events e ON r.event_id = e.id
+  JOIN totals t ON t.event_id = r.event_id AND t.gender = r.gender AND t.age_group = r.age_group
   WHERE LOWER(normalize_search(r.members)) LIKE LOWER('%' || normalize_search(?) || '%')
   ORDER BY e.race_name, r.rank_overall
   LIMIT 200

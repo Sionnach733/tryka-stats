@@ -1,5 +1,3 @@
-"use client";
-
 import StationCard from "./StationCard";
 import type { StationData } from "./StationCard";
 
