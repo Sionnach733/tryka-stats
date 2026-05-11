@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <div className="mx-auto max-w-5xl px-4 py-6">
           <header className="mb-6 flex items-baseline justify-between">
-            <Link href="/" className="text-xl font-semibold tracking-tight">
+            <Link href="/" className="text-xl font-bold uppercase tracking-wider text-tryka-green">
               Tryka Stats
             </Link>
             <a
@@ -30,10 +30,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </a>
           </header>
           <main>{children}</main>
-          <footer className="mt-12 border-t border-slate-200 pt-6 pb-8 text-center text-xs text-slate-400 dark:border-slate-800 dark:text-slate-500">
+          <footer className="mt-12 border-t border-tryka-navy-light pt-6 pb-8 text-center text-xs text-slate-400">
             <p>
               Built by{" "}
-              <a href={BMC_URL} target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-600 dark:hover:text-slate-300">
+              <a href={BMC_URL} target="_blank" rel="noopener noreferrer" className="underline hover:text-tryka-green">
                 Sionnach733
               </a>
             </p>
@@ -53,7 +53,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </a>
             <p className="mt-2">
               If you find this useful,{" "}
-              <a href={BMC_URL} target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-600 dark:hover:text-slate-300">
+              <a href={BMC_URL} target="_blank" rel="noopener noreferrer" className="underline hover:text-tryka-green">
                 consider buying me a coffee
               </a>
             </p>

@@ -73,13 +73,13 @@ export default function CompareSearch({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 pt-24"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 pt-24"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="w-full max-w-lg rounded-lg border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-900">
-        <div className="border-b border-slate-200 p-4 dark:border-slate-700">
+      <div className="w-full max-w-lg rounded-lg border border-tryka-navy-light bg-tryka-navy shadow-xl">
+        <div className="border-b border-tryka-navy-light p-4">
           <h3 className="text-sm font-semibold">Search for an athlete to compare</h3>
           <input
             ref={inputRef}
@@ -87,7 +87,7 @@ export default function CompareSearch({
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder="Search by athlete name…"
-            className="mt-2 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-800"
+            className="mt-2 w-full rounded-lg border border-tryka-navy-light bg-tryka-navy-light px-3 py-2 text-sm text-white shadow-sm placeholder:text-slate-400 focus:border-tryka-green focus:outline-none focus:ring-1 focus:ring-tryka-green"
           />
         </div>
 
@@ -104,7 +104,7 @@ export default function CompareSearch({
             <button
               key={hit.id}
               onClick={() => handleSelect(hit.id)}
-              className="flex w-full items-center justify-between px-4 py-3 text-left text-sm hover:bg-slate-50 dark:hover:bg-slate-800"
+              className="flex w-full items-center justify-between px-4 py-3 text-left text-sm hover:bg-tryka-navy-light"
             >
               <div>
                 <div className="font-medium">

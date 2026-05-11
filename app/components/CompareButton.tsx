@@ -28,14 +28,14 @@ export default function CompareButton({
       <div className="flex items-center gap-2">
         <button
           onClick={() => setShowSearch(true)}
-          className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+          className="rounded-md bg-tryka-green px-3 py-1.5 text-sm font-medium text-tryka-navy hover:bg-tryka-green/90"
         >
           {compareId != null ? "Change comparison" : "Compare"}
         </button>
         {compareId != null && (
           <button
             onClick={handleClear}
-            className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
+            className="rounded-md border border-tryka-navy-light px-3 py-1.5 text-sm font-medium text-slate-400 hover:bg-tryka-navy-light"
           >
             Clear
           </button>

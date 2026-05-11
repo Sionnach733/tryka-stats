@@ -28,13 +28,13 @@ export default function ComparisonSplits({
         <div>
           <h3 className="text-lg font-semibold">Race Comparison</h3>
         </div>
-        <div className="flex rounded-lg border border-slate-200 dark:border-slate-700">
+        <div className="flex rounded-lg border border-tryka-navy-light">
           <button
             onClick={() => setView("chart")}
             className={`px-3 py-1.5 text-xs font-medium rounded-l-lg ${
               view === "chart"
-                ? "bg-blue-600 text-white"
-                : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                ? "bg-tryka-green text-tryka-navy"
+                : "text-slate-400 hover:bg-tryka-navy-light"
             }`}
           >
             Chart
@@ -43,8 +43,8 @@ export default function ComparisonSplits({
             onClick={() => setView("table")}
             className={`px-3 py-1.5 text-xs font-medium rounded-r-lg ${
               view === "table"
-                ? "bg-blue-600 text-white"
-                : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                ? "bg-tryka-green text-tryka-navy"
+                : "text-slate-400 hover:bg-tryka-navy-light"
             }`}
           >
             Table

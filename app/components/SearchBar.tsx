@@ -68,17 +68,17 @@ export default function SearchBar({
           onChange={(e) => setValue(e.target.value)}
           placeholder="Search by athlete name (e.g. Sinead Bent)"
           autoFocus
-          className="flex-1 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900"
+          className="flex-1 rounded-lg border border-tryka-navy-light bg-tryka-navy-light px-3 py-2 text-sm text-white shadow-sm placeholder:text-slate-400 focus:border-tryka-green focus:outline-none focus:ring-1 focus:ring-tryka-green"
         />
         {loading && (
-          <span className="self-center text-sm text-slate-400">
+          <span className="self-center text-sm text-tryka-green">
             Searching…
           </span>
         )}
       </div>
 
       {value.trim().length > 0 && value.trim().length < 3 && (
-        <p className="mt-6 text-sm text-slate-500">
+        <p className="mt-6 text-sm text-slate-400">
           Type at least 3 characters to search.
         </p>
       )}

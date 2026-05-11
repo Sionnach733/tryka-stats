@@ -91,7 +91,7 @@ export default function ComparisonChart({
           x2={centerX}
           y2={splits.length * rowHeight}
           stroke="currentColor"
-          className="text-slate-400 dark:text-slate-600"
+          className="text-slate-500"
           strokeWidth={1}
         />
 
@@ -106,7 +106,7 @@ export default function ComparisonChart({
                 x2={x}
                 y2={splits.length * rowHeight}
                 stroke="currentColor"
-                className="text-slate-200 dark:text-slate-800"
+                className="text-tryka-navy-light"
                 strokeWidth={0.5}
               />
               <text
@@ -148,7 +148,7 @@ export default function ComparisonChart({
                 x={labelWidth - 8}
                 y={y + barH / 2 + 4}
                 textAnchor="end"
-                className="fill-slate-700 text-[11px] dark:fill-slate-300"
+                className="fill-slate-300 text-[11px]"
               >
                 {s.splitName}
               </text>
@@ -163,8 +163,8 @@ export default function ComparisonChart({
                   rx={3}
                   className={
                     isPositive
-                      ? "fill-rose-400 dark:fill-rose-500"
-                      : "fill-emerald-400 dark:fill-emerald-500"
+                      ? "fill-rose-500"
+                      : "fill-tryka-green"
                   }
                 />
               )}
@@ -183,7 +183,7 @@ export default function ComparisonChart({
                     diff > 0
                       ? "fill-rose-500"
                       : diff < 0
-                        ? "fill-emerald-500"
+                        ? "fill-tryka-green"
                         : "fill-slate-400"
                   }`}
                 >
@@ -219,7 +219,7 @@ export default function ComparisonChart({
                 width={200}
                 height={tooltipH}
                 rx={4}
-                className="fill-slate-800 dark:fill-slate-700"
+                className="fill-tryka-navy-light"
                 opacity={0.9}
               />
               {lines.map((line, i) => (

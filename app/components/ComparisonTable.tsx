@@ -32,38 +32,38 @@ export default function ComparisonTable({
   });
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800">
-      <table className="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
-        <thead className="bg-slate-100 text-xs uppercase tracking-wide text-slate-600 dark:bg-slate-900 dark:text-slate-400">
+    <div className="overflow-x-auto rounded-lg border border-tryka-navy-light">
+      <table className="min-w-full divide-y divide-tryka-navy-light text-sm">
+        <thead className="bg-tryka-navy-light text-xs uppercase tracking-wide text-slate-400">
           <tr>
             <th className="px-3 py-2 text-left">
               Split
             </th>
-            <th className="px-3 py-2 text-center border-l border-slate-200 dark:border-slate-800">
-              <div>{primaryName}</div>
+            <th className="px-3 py-2 text-center border-l border-tryka-navy">
+              <div className="text-white">{primaryName}</div>
               <div className="font-normal text-slate-400">{primaryRace}</div>
             </th>
-            <th className="px-3 py-2 text-center border-l border-slate-200 dark:border-slate-800">
-              <div>{secondaryName}</div>
+            <th className="px-3 py-2 text-center border-l border-tryka-navy">
+              <div className="text-white">{secondaryName}</div>
               <div className="font-normal text-slate-400">{secondaryRace}</div>
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100 dark:divide-slate-900">
+        <tbody className="divide-y divide-tryka-navy-light/50">
           {rows.map((r) => (
             <tr key={r.splitName}>
               <td
-                className="px-3 py-2 font-medium text-slate-900 dark:text-white"
+                className="px-3 py-2 font-medium text-white"
               >
                 {r.splitName}
               </td>
-              <td className="px-3 py-2 text-right tabular-nums border-l border-slate-100 dark:border-slate-900">
+              <td className="px-3 py-2 text-right tabular-nums border-l border-tryka-navy-light/50">
                 {r.primarySplit != null ? formatMmSs(r.primarySplit) : "—"}
                 {r.splitDiff != null && (
                   <DiffBadge diff={r.splitDiff} />
                 )}
               </td>
-              <td className="px-3 py-2 text-right tabular-nums border-l border-slate-100 dark:border-slate-900">
+              <td className="px-3 py-2 text-right tabular-nums border-l border-tryka-navy-light/50">
                 {r.secondarySplit != null
                   ? formatMmSs(r.secondarySplit)
                   : "—"}
@@ -84,7 +84,7 @@ function DiffBadge({ diff }: { diff: number }) {
       className={`ml-1.5 text-xs font-medium ${
         isSlower
           ? "text-rose-500"
-          : "text-emerald-500"
+          : "text-tryka-green"
       }`}
     >
       {formatDiff(diff)}

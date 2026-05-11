@@ -35,16 +35,16 @@ export default function ComparisonTiles({
   return (
     <section>
       <h2 className="text-lg font-semibold">Key Totals</h2>
-      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+      <p className="mt-1 text-sm text-slate-400">
         Top-level times compared side by side (positive = first athlete is slower)
       </p>
       <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {cards.map((c) => (
           <div
             key={c.label}
-            className="rounded-lg border border-slate-200 bg-white px-3 py-3 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+            className="rounded-lg border border-tryka-navy-light bg-tryka-navy-light px-3 py-3 shadow-sm"
           >
-            <div className="text-xs uppercase tracking-wide text-slate-500">
+            <div className="text-xs uppercase tracking-wide text-slate-400">
               {c.label}
             </div>
             <div
@@ -52,7 +52,7 @@ export default function ComparisonTiles({
                 c.diff == null
                   ? "text-slate-400"
                   : c.diff < 0
-                    ? "text-emerald-500"
+                    ? "text-tryka-green"
                     : c.diff > 0
                       ? "text-rose-500"
                       : "text-slate-400"

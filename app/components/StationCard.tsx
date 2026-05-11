@@ -28,7 +28,7 @@ export default function StationCard({ data }: { data: StationData }) {
 
   return (
     <div
-      className={`rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 ${rankBorder}`}
+      className={`rounded-lg border border-tryka-navy-light bg-tryka-navy-light p-4 shadow-sm ${rankBorder}`}
     >
       <h3 className="text-sm font-semibold uppercase tracking-wide">
         {station}
@@ -42,7 +42,7 @@ export default function StationCard({ data }: { data: StationData }) {
           {time != null ? formatMmSs(time) : "N/A"}
         </span>
         {percentile != null && (
-          <span className="text-slate-500 dark:text-slate-400">
+          <span className="text-slate-400">
             top {percentile.toFixed(1)}%
           </span>
         )}
@@ -142,7 +142,7 @@ function KdePlot({
         >
           <path
             d={areaPath}
-            className="fill-slate-200 dark:fill-slate-700"
+            className="fill-tryka-green/20"
           />
           {athleteX != null && (
             <line
@@ -150,7 +150,7 @@ function KdePlot({
               y1={0}
               x2={athleteX}
               y2={svgH}
-              className="stroke-blue-600 dark:stroke-blue-400"
+              className="stroke-tryka-green"
               strokeWidth={2}
             >
               <title>Your time: {formatMmSs(athleteTime!)}</title>
@@ -162,7 +162,7 @@ function KdePlot({
               y1={0}
               x2={hover.svgX}
               y2={svgH}
-              className="stroke-slate-400 dark:stroke-slate-500"
+              className="stroke-slate-500"
               strokeWidth={1}
               strokeDasharray="3 2"
             />
@@ -170,7 +170,7 @@ function KdePlot({
         </svg>
         {hover && (
           <div
-            className="pointer-events-none absolute -top-10 z-10 rounded bg-slate-800 px-2 py-1 text-[11px] tabular-nums text-white shadow dark:bg-slate-200 dark:text-slate-900"
+            className="pointer-events-none absolute -top-10 z-10 rounded bg-tryka-navy px-2 py-1 text-[11px] tabular-nums text-white shadow ring-1 ring-tryka-navy-light"
             style={{
               left: `${(hover.svgX / svgW) * 100}%`,
               transform: "translateX(-50%)",

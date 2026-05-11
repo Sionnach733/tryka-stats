@@ -88,7 +88,7 @@ export default async function ResultPage({ params, searchParams }: { params: Par
       <div className="flex items-center justify-between">
         <Link
           href={q ? `/?q=${encodeURIComponent(q)}` : "/"}
-          className="text-sm text-blue-700 hover:underline dark:text-blue-400"
+          className="text-sm text-tryka-green hover:underline"
         >
           &larr; Back to search
         </Link>
@@ -163,7 +163,7 @@ function Field({
 }) {
   return (
     <div>
-      <dt className="text-xs uppercase tracking-wide text-slate-500">{label}</dt>
+      <dt className="text-xs uppercase tracking-wide text-slate-400">{label}</dt>
       <dd className={mono ? "tabular-nums font-medium" : "font-medium"}>
         {value && value.length > 0 ? value : "—"}
       </dd>
@@ -179,11 +179,11 @@ function AthleteCard({
   members: string[];
 }) {
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <section className="rounded-lg border border-tryka-navy-light bg-tryka-navy-light p-5 shadow-sm">
       <h1 className="text-2xl font-semibold tracking-tight">
         {displayMembers(members)}
       </h1>
-      <p className="mt-1 text-slate-600 dark:text-slate-400">
+      <p className="mt-1 text-slate-400">
         {result.race_name} &middot; {result.division}
       </p>
 
@@ -262,9 +262,9 @@ function Notice({
   value: string;
 }) {
   const styles = {
-    good: "border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-200",
-    warn: "border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200",
-    bad: "border-rose-300 bg-rose-50 text-rose-900 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-200",
+    good: "border-tryka-green/30 bg-tryka-green/10 text-tryka-green",
+    warn: "border-amber-500/30 bg-amber-500/10 text-amber-400",
+    bad: "border-rose-500/30 bg-rose-500/10 text-rose-400",
   }[tone];
   return (
     <div className={`rounded border px-3 py-2 ${styles}`}>
@@ -326,9 +326,9 @@ function SummaryTiles({
       {tiles.map((t) => (
         <div
           key={t.label}
-          className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+          className="rounded-lg border border-tryka-navy-light bg-tryka-navy-light px-3 py-2.5 shadow-sm"
         >
-          <div className="text-xs uppercase tracking-wide text-slate-500">
+          <div className="text-xs uppercase tracking-wide text-slate-400">
             {t.label}
           </div>
           <div className="mt-1 text-lg font-semibold tabular-nums">
@@ -464,14 +464,14 @@ function SplitsTable({
 }) {
   if (rows.length === 0) {
     return (
-      <p className="text-sm text-slate-500">No splits recorded.</p>
+      <p className="text-sm text-slate-400">No splits recorded.</p>
     );
   }
   const numeric = new Set(numericCols);
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800">
-      <table className="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
-        <thead className="bg-slate-100 text-left text-xs uppercase tracking-wide text-slate-600 dark:bg-slate-900 dark:text-slate-400">
+    <div className="overflow-x-auto rounded-lg border border-tryka-navy-light">
+      <table className="min-w-full divide-y divide-tryka-navy-light text-sm">
+        <thead className="bg-tryka-navy-light text-left text-xs uppercase tracking-wide text-slate-400">
           <tr>
             {headers.map((h, i) => (
               <th
@@ -483,7 +483,7 @@ function SplitsTable({
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100 dark:divide-slate-900">
+        <tbody className="divide-y divide-tryka-navy-light/50">
           {rows.map((row, rIdx) => (
             <tr key={rIdx}>
               {row.map((cell, cIdx) => (
