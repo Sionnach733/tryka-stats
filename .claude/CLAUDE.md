@@ -40,6 +40,13 @@ Tests require `tryka.db` to be accessible at the default path (`../tryka-scraper
 - **`queries.ts`** — 5 prepared statements: `searchAthletes`, `getResult`, `getRefinedSplits`, `getRawSplits`, `getStationFieldTimes`
 - **`format.ts`** — pure helpers: `parseMembers`, `displayMembers`, `displayGender`, `displayPace`, `parseTime`, `formatMmSs`, `computeKde`
 
+## Sibling Project: tryka-scraper
+
+The database is produced by [`tryka-scraper`](../tryka-scraper), a Python scraper. When working on database-related changes (schema, indexes, queries), reference the scraper's files:
+
+@../tryka-scraper/CLAUDE.md
+@../tryka-scraper/schema.sql
+
 ## Database
 
 The app opens `tryka.db` **read-only** — it never writes. Schema owned by `tryka-scraper` (see `../tryka-scraper/schema.sql`). Key tables:

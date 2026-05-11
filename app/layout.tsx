@@ -15,19 +15,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <div className="mx-auto max-w-5xl px-4 py-6">
-          <header className="mb-6 flex items-baseline justify-between">
+          <header className="mb-6">
             <Link href="/" className="text-xl font-bold uppercase tracking-wider text-tryka-green">
               Tryka Stats
             </Link>
-            <a
-              href={BMC_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#FFDD00] px-3 py-1.5 text-xs font-semibold text-slate-900 shadow-sm transition-transform hover:scale-105"
-            >
-              <Image src="/bmc-qr.png" alt="" width={16} height={16} className="rounded-sm" />
-              Buy me a coffee
-            </a>
           </header>
           <main>{children}</main>
           <footer className="mt-12 border-t border-tryka-navy-light pt-6 pb-8 text-center text-xs text-slate-400">
