@@ -26,8 +26,11 @@ function initDb(): Database.Database {
   return conn;
 }
 
-// Reuse a single connection across hot reloads in dev.
-export const db: Database.Database = global.__trykaDb ?? initDb();
-if (process.env.NODE_ENV !== "production") {
-  global.__trykaDb = db;
+// Lazy singleton — the database is only opened on first call, not at import
+// time. This prevents build-time errors during Next.js page data collection.
+export function getDb(): Database.Database {
+  if (global.__trykaDb) return global.__trykaDb;
+  const conn = initDb();
+  global.__trykaDb = conn;
+  return conn;
 }
