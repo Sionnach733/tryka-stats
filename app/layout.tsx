@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import "./globals.css";
+import Navbar from "./components/Navbar";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://trykastats.com"),
@@ -54,11 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         <div className="mx-auto max-w-5xl px-4 py-6">
-          <header className="mb-6">
-            <Link href="/" className="text-xl font-bold uppercase tracking-wider text-tryka-green">
-              Tryka Stats
-            </Link>
-          </header>
+          <Navbar />
           <main>{children}</main>
           <footer className="mt-12 border-t border-tryka-navy-light pt-6 pb-8 text-center text-xs text-slate-400">
             <p>

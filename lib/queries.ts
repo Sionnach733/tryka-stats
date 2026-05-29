@@ -57,6 +57,15 @@ export type StationFieldRow = {
 
 export type ResultIdRow = { id: number };
 
+export type FinishTimeRow = { id: number; overall_time: string | null };
+
+export type RefinedSplitWithResultRow = {
+  result_id: number;
+  split_order: number;
+  split_name: string;
+  time: string | null;
+};
+
 // Lazily prepared statements — cached after first call to avoid
 // opening the database at import time (which breaks Next.js builds).
 let searchStmt: Database.Statement<[string], SearchHit> | null = null;
@@ -66,6 +75,12 @@ let rawStmt: Database.Statement<[number], RawSplit> | null = null;
 let stationFieldStmt: Database.Statement<[number, string], StationFieldRow> | null = null;
 let runFieldStmt: Database.Statement<[number, string], StationFieldRow> | null = null;
 let allIdsStmt: Database.Statement<[], ResultIdRow> | null = null;
+let finishTimesByDivGenderStmt:
+  | Database.Statement<[string, string], FinishTimeRow>
+  | null = null;
+let distinctDivisionsStmt:
+  | Database.Statement<[], { division: string }>
+  | null = null;
 
 function getSearchStmt() {
   if (!searchStmt) {
@@ -205,4 +220,57 @@ function getAllIdsStmt() {
 
 export function getAllResultIds(): ResultIdRow[] {
   return getAllIdsStmt().all();
+}
+
+function getFinishTimesByDivGenderStmt() {
+  if (!finishTimesByDivGenderStmt) {
+    finishTimesByDivGenderStmt = getDb().prepare<
+      [string, string],
+      FinishTimeRow
+    >(`
+      SELECT r.id, r.overall_time
+      FROM results r
+      JOIN events e ON r.event_id = e.id
+      WHERE e.division = ? AND r.gender = ?
+        AND r.overall_time IS NOT NULL
+    `);
+  }
+  return finishTimesByDivGenderStmt;
+}
+
+export function getFinishTimesByDivisionAndGender(
+  division: string,
+  gender: string,
+): FinishTimeRow[] {
+  return getFinishTimesByDivGenderStmt().all(division, gender);
+}
+
+function getDistinctDivisionsStmt() {
+  if (!distinctDivisionsStmt) {
+    distinctDivisionsStmt = getDb().prepare<[], { division: string }>(
+      `SELECT DISTINCT division FROM events ORDER BY division`
+    );
+  }
+  return distinctDivisionsStmt;
+}
+
+export function getDistinctDivisions(): string[] {
+  return getDistinctDivisionsStmt()
+    .all()
+    .map((r) => r.division);
+}
+
+export function getRefinedSplitsForResults(
+  ids: number[]
+): RefinedSplitWithResultRow[] {
+  if (ids.length === 0) return [];
+  const placeholders = ids.map(() => "?").join(",");
+  const stmt = getDb().prepare<number[], RefinedSplitWithResultRow>(`
+    SELECT result_id, split_order, split_name, time
+    FROM refined_splits
+    WHERE result_id IN (${placeholders})
+      AND time IS NOT NULL
+    ORDER BY split_order
+  `);
+  return stmt.all(...ids);
 }
