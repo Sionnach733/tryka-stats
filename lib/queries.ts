@@ -55,6 +55,8 @@ export type StationFieldRow = {
   time: string;
 };
 
+export type ResultIdRow = { id: number };
+
 // Lazily prepared statements — cached after first call to avoid
 // opening the database at import time (which breaks Next.js builds).
 let searchStmt: Database.Statement<[string], SearchHit> | null = null;
@@ -63,6 +65,7 @@ let refinedStmt: Database.Statement<[number], RefinedSplit> | null = null;
 let rawStmt: Database.Statement<[number], RawSplit> | null = null;
 let stationFieldStmt: Database.Statement<[number, string], StationFieldRow> | null = null;
 let runFieldStmt: Database.Statement<[number, string], StationFieldRow> | null = null;
+let allIdsStmt: Database.Statement<[], ResultIdRow> | null = null;
 
 function getSearchStmt() {
   if (!searchStmt) {
@@ -189,4 +192,17 @@ export function getStationFieldTimes(eventId: number, gender: string): StationFi
 
 export function getRunFieldTimes(eventId: number, gender: string): StationFieldRow[] {
   return getRunFieldStmt().all(eventId, gender);
+}
+
+function getAllIdsStmt() {
+  if (!allIdsStmt) {
+    allIdsStmt = getDb().prepare<[], ResultIdRow>(
+      `SELECT id FROM results ORDER BY id`
+    );
+  }
+  return allIdsStmt;
+}
+
+export function getAllResultIds(): ResultIdRow[] {
+  return getAllIdsStmt().all();
 }

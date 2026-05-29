@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import {
   getRawSplits,
   getRefinedSplits,
@@ -25,6 +26,34 @@ export const revalidate = 3600;
 
 type Params = Promise<{ id: string }>;
 type SearchParams = Promise<{ q?: string; compare?: string }>;
+
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const { id: rawId } = await params;
+  const id = Number(rawId);
+  if (!Number.isFinite(id)) return {};
+  const result = getResult(id);
+  if (!result) return {};
+
+  const name = displayMembers(parseMembers(result.members));
+  const time = result.overall_time ?? "DNF";
+  const title = `${name} – ${time} – ${result.race_name}`;
+  const rankPart = result.rank_overall != null ? `#${result.rank_overall} of ${result.total_gender}` : "";
+  const agPart = [result.age_group, displayGender(result.gender)].filter(Boolean).join(" ");
+  const description = [
+    `${name} finished ${rankPart} in ${result.race_name} (${result.division})`,
+    agPart,
+    `Time: ${time}`,
+  ].filter(Boolean).join(". ") + ".";
+  const url = `https://trykastats.com/results/${id}`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: { title, description, url, siteName: "Tryka Stats", type: "website" },
+    twitter: { card: "summary", title, description },
+  };
+}
 
 export default async function ResultPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
   const { id: rawId } = await params;
@@ -85,6 +114,21 @@ export default async function ResultPage({ params, searchParams }: { params: Par
 
   return (
     <div className="space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SportsEvent",
+            name: result.race_name,
+            description: `${result.division} division`,
+            competitor: {
+              "@type": "Person",
+              name: primaryName,
+            },
+          }),
+        }}
+      />
       <div className="flex items-center justify-between">
         <Link
           href={q ? `/?q=${encodeURIComponent(q)}` : "/"}

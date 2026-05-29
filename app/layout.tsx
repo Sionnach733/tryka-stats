@@ -4,8 +4,29 @@ import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Tryka Stats",
-  description: "Look up your Tryka race results and splits.",
+  metadataBase: new URL("https://trykastats.com"),
+  title: {
+    default: "Tryka Stats – Obstacle Course Race Results & Splits",
+    template: "%s | Tryka Stats",
+  },
+  description:
+    "Search and analyse your Tryka obstacle-course race results, splits, station times, and rankings.",
+  openGraph: {
+    title: "Tryka Stats",
+    description:
+      "Search and analyse your Tryka obstacle-course race results, splits, station times, and rankings.",
+    url: "https://trykastats.com",
+    siteName: "Tryka Stats",
+    type: "website",
+    locale: "en_IE",
+  },
+  twitter: {
+    card: "summary",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 const BMC_URL = "https://buymeacoffee.com/sionnach733";
@@ -14,6 +35,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "Tryka Stats",
+              url: "https://trykastats.com",
+              description:
+                "Search and analyse your Tryka obstacle-course race results, splits, station times, and rankings.",
+              potentialAction: {
+                "@type": "SearchAction",
+                target: "https://trykastats.com/?q={search_term_string}",
+                "query-input": "required name=search_term_string",
+              },
+            }),
+          }}
+        />
         <div className="mx-auto max-w-5xl px-4 py-6">
           <header className="mb-6">
             <Link href="/" className="text-xl font-bold uppercase tracking-wider text-tryka-green">
