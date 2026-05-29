@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { getAllResultIds } from "@/lib/queries";
 
+export const dynamic = "force-dynamic";
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const ids = getAllResultIds();
 
