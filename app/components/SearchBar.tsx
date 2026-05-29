@@ -66,7 +66,7 @@ export default function SearchBar({
           name="q"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          placeholder="Search by athlete name (e.g. Sinead Bent)"
+          placeholder="Search by athlete name (e.g. Aoife O'Rourke)"
           autoFocus
           className="flex-1 rounded-lg border border-tryka-navy-light bg-tryka-navy-light px-3 py-2 text-sm text-white shadow-sm placeholder:text-slate-400 focus:border-tryka-green focus:outline-none focus:ring-1 focus:ring-tryka-green"
         />
