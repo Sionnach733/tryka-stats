@@ -42,8 +42,25 @@ export default async function CalculatorPage({
   const divisions = getDistinctDivisions();
 
   const targetSeconds = target ? parseTime(target) : null;
-  const isTargetInvalid = target.length > 0 && targetSeconds == null;
   const allInputs = division.length > 0 && gender.length > 0 && targetSeconds != null;
+
+  const submitted =
+    params.division !== undefined ||
+    params.gender !== undefined ||
+    params.target !== undefined;
+  const divisionError = submitted && division.length === 0
+    ? "Please select a division."
+    : null;
+  const genderError = submitted && gender.length === 0
+    ? "Please select a gender."
+    : null;
+  const targetError = submitted
+    ? target.length === 0
+      ? "Please enter a target finish time."
+      : targetSeconds == null
+        ? "Couldn't read that time. Try a format like 45:00 or 1:05:30."
+        : null
+    : null;
 
   let atomic: ReturnType<typeof averageSplits> = [];
   let poolSize = 0;
@@ -83,50 +100,82 @@ export default async function CalculatorPage({
         action="/calculator"
         className="mb-8 flex flex-wrap items-center gap-x-6 gap-y-3"
       >
-        <label className="flex items-center gap-2 text-xs uppercase tracking-wide text-slate-400">
-          Division
-          <select
-            name="division"
-            defaultValue={division}
-            className="rounded border border-tryka-navy-light bg-tryka-navy px-3 py-2 text-sm text-white focus:border-tryka-green focus:outline-none focus:ring-1 focus:ring-tryka-green"
-          >
-            <option value="">Select division…</option>
-            {divisions.map((d) => (
-              <option key={d} value={d}>
-                {d}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div>
+          <label className="flex items-center gap-2 text-xs uppercase tracking-wide text-slate-400">
+            Division
+            <select
+              name="division"
+              defaultValue={division}
+              required
+              aria-invalid={divisionError ? true : undefined}
+              aria-describedby={divisionError ? "division-error" : undefined}
+              className={`rounded border ${divisionError ? "border-red-500/60" : "border-tryka-navy-light"} bg-tryka-navy px-3 py-2 text-sm text-white focus:border-tryka-green focus:outline-none focus:ring-1 focus:ring-tryka-green`}
+            >
+              <option value="">Select division…</option>
+              {divisions.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
+            </select>
+          </label>
+          {divisionError && (
+            <p id="division-error" className="mt-1 text-xs text-red-300">
+              {divisionError}
+            </p>
+          )}
+        </div>
 
-        <label className="flex items-center gap-2 text-xs uppercase tracking-wide text-slate-400">
-          Gender
-          <select
-            name="gender"
-            defaultValue={gender}
-            className="rounded border border-tryka-navy-light bg-tryka-navy px-3 py-2 text-sm text-white focus:border-tryka-green focus:outline-none focus:ring-1 focus:ring-tryka-green"
-          >
-            <option value="">Select gender…</option>
-            {GENDERS.map((g) => (
-              <option key={g} value={g}>
-                {displayGender(g)}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div>
+          <label className="flex items-center gap-2 text-xs uppercase tracking-wide text-slate-400">
+            Gender
+            <select
+              name="gender"
+              defaultValue={gender}
+              required
+              aria-invalid={genderError ? true : undefined}
+              aria-describedby={genderError ? "gender-error" : undefined}
+              className={`rounded border ${genderError ? "border-red-500/60" : "border-tryka-navy-light"} bg-tryka-navy px-3 py-2 text-sm text-white focus:border-tryka-green focus:outline-none focus:ring-1 focus:ring-tryka-green`}
+            >
+              <option value="">Select gender…</option>
+              {GENDERS.map((g) => (
+                <option key={g} value={g}>
+                  {displayGender(g)}
+                </option>
+              ))}
+            </select>
+          </label>
+          {genderError && (
+            <p id="gender-error" className="mt-1 text-xs text-red-300">
+              {genderError}
+            </p>
+          )}
+        </div>
 
-        <label className="flex items-center gap-2 text-xs uppercase tracking-wide text-slate-400">
-          Target finish time
-          <input
-            type="text"
-            name="target"
-            defaultValue={target}
-            placeholder="e.g. 45:00 or 1:05:30"
-            inputMode="numeric"
-            autoComplete="off"
-            className="w-44 rounded border border-tryka-navy-light bg-tryka-navy px-3 py-2 text-sm tabular-nums text-white placeholder:text-slate-500 focus:border-tryka-green focus:outline-none focus:ring-1 focus:ring-tryka-green"
-          />
-        </label>
+        <div>
+          <label className="flex items-center gap-2 text-xs uppercase tracking-wide text-slate-400">
+            Target finish time
+            <input
+              type="text"
+              name="target"
+              defaultValue={target}
+              placeholder="e.g. 45:00 or 1:05:30"
+              inputMode="numeric"
+              autoComplete="off"
+              required
+              pattern="\d{1,2}:\d{2}(:\d{2})?"
+              title="Use MM:SS or H:MM:SS"
+              aria-invalid={targetError ? true : undefined}
+              aria-describedby={targetError ? "target-error" : undefined}
+              className={`w-44 rounded border ${targetError ? "border-red-500/60" : "border-tryka-navy-light"} bg-tryka-navy px-3 py-2 text-sm tabular-nums text-white placeholder:text-slate-500 focus:border-tryka-green focus:outline-none focus:ring-1 focus:ring-tryka-green`}
+            />
+          </label>
+          {targetError && (
+            <p id="target-error" className="mt-1 text-xs text-red-300">
+              {targetError}
+            </p>
+          )}
+        </div>
 
         <button
           type="submit"
@@ -135,13 +184,6 @@ export default async function CalculatorPage({
           Calculate
         </button>
       </form>
-
-      {isTargetInvalid && (
-        <p className="mb-6 rounded border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-200">
-          Couldn&apos;t read that time. Try a format like <code>45:00</code> or{" "}
-          <code>1:05:30</code>.
-        </p>
-      )}
 
       {allInputs && atomic.length === 0 && (
         <p className="rounded border border-tryka-navy-light bg-tryka-navy-light p-3 text-sm text-slate-300">
