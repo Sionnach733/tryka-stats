@@ -70,9 +70,11 @@ describe("formatMmSs", () => {
   it("formats seconds as MM:SS", () => expect(formatMmSs(942)).toBe("15:42"));
   it("pads minutes and seconds", () => expect(formatMmSs(65)).toBe("01:05"));
   it("handles zero", () => expect(formatMmSs(0)).toBe("00:00"));
+  it("rounds up correctly when seconds would be 60", () => expect(formatMmSs(299.7)).toBe("05:00"));
 });
 
 describe("formatPace", () => {
   it("calculates pace for 6.4km", () => expect(formatPace(942, 6.4)).toBe("2:27 /km"));
   it("calculates pace for 4km", () => expect(formatPace(942, 4)).toBe("3:56 /km"));
+  it("rounds up correctly when seconds would be 60", () => expect(formatPace(299.7, 1)).toBe("5:00 /km"));
 });
