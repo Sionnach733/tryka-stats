@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { TimeInput } from "@/app/components/TimeInput";
 import { displayGender, formatMmSs, formatPace, parseTime } from "@/lib/format";
 import {
   CALCULATOR_POOL_SIZE,
@@ -155,20 +156,7 @@ export default async function CalculatorPage({
         <div>
           <label className="flex items-center gap-2 text-xs uppercase tracking-wide text-slate-400">
             Target finish time
-            <input
-              type="text"
-              name="target"
-              defaultValue={target}
-              placeholder="e.g. 45:00 or 1:05:30"
-              inputMode="numeric"
-              autoComplete="off"
-              required
-              pattern="\d{1,2}:\d{2}(:\d{2})?"
-              title="Use MM:SS or H:MM:SS"
-              aria-invalid={targetError ? true : undefined}
-              aria-describedby={targetError ? "target-error" : undefined}
-              className={`w-44 rounded border ${targetError ? "border-red-500/60" : "border-tryka-navy-light"} bg-tryka-navy px-3 py-2 text-sm tabular-nums text-white placeholder:text-slate-500 focus:border-tryka-green focus:outline-none focus:ring-1 focus:ring-tryka-green`}
-            />
+            <TimeInput defaultValue={target} hasError={!!targetError} />
           </label>
           {targetError && (
             <p id="target-error" className="mt-1 text-xs text-red-300">
