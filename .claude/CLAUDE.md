@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-`tryka-stats` is a Next.js webapp that lets athletes search and analyse their results from Tryka obstacle-course races. It reads the SQLite database produced by the sibling [`tryka-scraper`](../tryka-scraper) project.
+`tryka-stats` is a Next.js webapp that lets athletes search and analyse their results from Tryka races. It reads the SQLite database produced by the sibling [`tryka-scraper`](../tryka-scraper) project.
 
 ## Commands
 

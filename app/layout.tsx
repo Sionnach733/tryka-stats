@@ -6,15 +6,15 @@ import Navbar from "./components/Navbar";
 export const metadata: Metadata = {
   metadataBase: new URL("https://trykastats.com"),
   title: {
-    default: "Tryka Stats – Obstacle Course Race Results & Splits",
+    default: "Tryka Stats – Tryka Race Results & Splits",
     template: "%s | Tryka Stats",
   },
   description:
-    "Search and analyse your Tryka obstacle-course race results, splits, station times, and rankings.",
+    "Search and analyse your Tryka race results, splits, station times, and rankings.",
   openGraph: {
     title: "Tryka Stats",
     description:
-      "Search and analyse your Tryka obstacle-course race results, splits, station times, and rankings.",
+      "Search and analyse your Tryka race results, splits, station times, and rankings.",
     url: "https://trykastats.com",
     siteName: "Tryka Stats",
     type: "website",
@@ -44,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               name: "Tryka Stats",
               url: "https://trykastats.com",
               description:
-                "Search and analyse your Tryka obstacle-course race results, splits, station times, and rankings.",
+                "Search and analyse your Tryka race results, splits, station times, and rankings.",
               potentialAction: {
                 "@type": "SearchAction",
                 target: "https://trykastats.com/?q={search_term_string}",
