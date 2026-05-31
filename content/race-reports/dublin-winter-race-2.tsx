@@ -1,5 +1,4 @@
 import StationPicker, { type StationsByDivision } from "@/app/components/StationPicker";
-import StationStandards from "@/app/components/StationStandards";
 
 // Stats computed from the tryka.db snapshot for DUBLIN WINTER RACE 2.
 // Percentile groups with fewer than 5 athletes were dropped.
@@ -335,8 +334,6 @@ export default function DublinWinterRace2Report() {
         </p>
 
         <StationPicker divisions={STATION_DATA_BY_DIVISION} />
-
-        <StationStandards />
 
         <h3 className="mb-3 mt-8 text-xs uppercase tracking-wide text-slate-400">
           Fastest single time per station
