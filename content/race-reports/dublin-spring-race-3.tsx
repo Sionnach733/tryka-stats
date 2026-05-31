@@ -5,7 +5,7 @@ import StationPicker, { type StationsByDivision } from "@/app/components/Station
 // Percentile direction: HIGHER = ELITE (99th column = fastest times, 25th = slowest).
 
 export const intro =
-  "Dublin Spring Race 3 drew 4,495 athletes — the biggest field of the Tryka calendar so far. The day belonged to the doubles teams, who accounted for nearly two thirds of the start list and produced the day's fastest single-station times. Josh Flynn and Paul O'Brien won Doubles 800 and went on to set the fastest Lunges and Burpees splits of the entire race.";
+  "Dublin Spring Race 3 drew 7,648 athletes across 4,495 entries — the biggest field of the Tryka calendar so far. The day belonged to the doubles teams, who accounted for nearly two thirds of the start list and produced the day's fastest single-station times. Josh Flynn and Paul O'Brien won Doubles 800 and went on to set the fastest Lunges and Burpees splits of the entire race.";
 
 type PercentileRow = {
   division: string;
@@ -236,7 +236,7 @@ export default function DublinSpringRace3Report() {
     <div className="space-y-10">
       <CalloutStrip />
 
-      <Section title="TL;DR">
+      <Section title="Key Insights">
         <ul className="list-disc space-y-2 pl-5 text-sm text-slate-300">
           <li>
             Doubles 500 was the day's biggest field at 1,597 athletes — 35% of the race and
@@ -264,19 +264,21 @@ export default function DublinSpringRace3Report() {
 
       <Section title="Race overview">
         <p className="mb-4 text-sm text-slate-300">
-          4,495 athletes raced across seven divisions. Women outnumbered men 2,302 to 1,444; mixed
-          teams added another 749. The largest age bands were 30–39 (1,134), 40–49 (1,066) and
-          20–29 (557).
+          7,648 athletes raced across seven divisions. Each Doubles entry is a team of two and
+          each Relay entry a team of four, so the 4,495 start-line entries represented 7,648
+          people in total. By category, 2,302 women's entries outnumbered 1,444 men's; mixed
+          teams added another 749. The largest age bands by entry count were 30–39 (1,134), 40–49
+          (1,066) and 20–29 (557).
         </p>
 
-        <h3 className="mb-2 text-xs uppercase tracking-wide text-slate-400">Athletes per division</h3>
+        <h3 className="mb-2 text-xs uppercase tracking-wide text-slate-400">Entries per division</h3>
         <BarChart
           data={ATHLETES_PER_DIVISION}
           max={Math.max(...ATHLETES_PER_DIVISION.map((d) => d.value))}
           labelWidth={140}
         />
 
-        <h3 className="mb-2 mt-6 text-xs uppercase tracking-wide text-slate-400">Gender split</h3>
+        <h3 className="mb-2 mt-6 text-xs uppercase tracking-wide text-slate-400">Entries by gender category</h3>
         <BarChart
           data={GENDER_SPLIT}
           max={Math.max(...GENDER_SPLIT.map((d) => d.value))}
@@ -401,7 +403,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function CalloutStrip() {
   const items = [
-    { label: "Athletes", value: "4,495" },
+    { label: "Athletes", value: "7,648" },
     { label: "Largest field", value: "1,597" },
     { label: "Fastest finish", value: "40:59" },
   ];

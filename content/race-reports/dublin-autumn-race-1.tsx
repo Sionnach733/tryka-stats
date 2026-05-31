@@ -5,7 +5,7 @@ import StationPicker, { type StationsByDivision } from "@/app/components/Station
 // Percentile direction: HIGHER = ELITE (99th column = fastest times, 25th = slowest).
 
 export const intro =
-  "Dublin Autumn Race 1 was the start of the series — 2,316 athletes, the smallest of the three Dublin races, but where the patterns were set. Doubles 800 swept the day's station records, Open 500 drew twice as many women as men, and Ellie Carmody won Pro Women in 56:50, kicking off what became a multi-race winning streak.";
+  "Dublin Autumn Race 1 was the start of the series — 3,796 athletes across 2,316 entries, the smallest of the three Dublin races but where the patterns were set. Doubles 800 swept the day's station records, Open 500 drew twice as many women as men, and Ellie Carmody won Pro Women in 56:50, kicking off what became a multi-race winning streak.";
 
 type PercentileRow = {
   division: string;
@@ -237,7 +237,7 @@ export default function DublinAutumnRace1Report() {
     <div className="space-y-10">
       <CalloutStrip />
 
-      <Section title="TL;DR">
+      <Section title="Key Insights">
         <ul className="list-disc space-y-2 pl-5 text-sm text-slate-300">
           <li>
             Doubles 800 owned the station record book — seven of the eight fastest single-team
@@ -265,19 +265,21 @@ export default function DublinAutumnRace1Report() {
 
       <Section title="Race overview">
         <p className="mb-4 text-sm text-slate-300">
-          2,316 athletes raced across seven divisions — the smallest field of the three Dublin
-          races. Women outnumbered men 1,177 to 831; mixed teams added 308. The largest age bands
-          were 40–49 (513), 30–39 (495) and 20–29 (198).
+          3,796 athletes raced across seven divisions — the smallest field of the three Dublin
+          races. Each Doubles entry is a team of two and each Relay entry a team of four, so the
+          2,316 start-line entries represented 3,796 people in total. By category, 1,177 women's
+          entries outnumbered 831 men's; mixed teams added 308. The largest age bands by entry
+          count were 40–49 (513), 30–39 (495) and 20–29 (198).
         </p>
 
-        <h3 className="mb-2 text-xs uppercase tracking-wide text-slate-400">Athletes per division</h3>
+        <h3 className="mb-2 text-xs uppercase tracking-wide text-slate-400">Entries per division</h3>
         <BarChart
           data={ATHLETES_PER_DIVISION}
           max={Math.max(...ATHLETES_PER_DIVISION.map((d) => d.value))}
           labelWidth={140}
         />
 
-        <h3 className="mb-2 mt-6 text-xs uppercase tracking-wide text-slate-400">Gender split</h3>
+        <h3 className="mb-2 mt-6 text-xs uppercase tracking-wide text-slate-400">Entries by gender category</h3>
         <BarChart
           data={GENDER_SPLIT}
           max={Math.max(...GENDER_SPLIT.map((d) => d.value))}
@@ -407,7 +409,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function CalloutStrip() {
   const items = [
-    { label: "Athletes", value: "2,316" },
+    { label: "Athletes", value: "3,796" },
     { label: "Largest field", value: "729" },
     { label: "Fastest finish", value: "40:55" },
   ];

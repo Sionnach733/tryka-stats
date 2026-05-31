@@ -5,7 +5,7 @@ import StationPicker, { type StationsByDivision } from "@/app/components/Station
 // Percentile direction: HIGHER = ELITE (99th column = fastest times, 25th = slowest).
 
 export const intro =
-  "Dublin Winter Race 2 brought 3,790 athletes to the start line, with Doubles 800 taking over from Doubles 500 as the day's biggest field. Darren Saunders and Jason Devereux blitzed the fastest finish in 39:11 — the only team under 40 minutes — and Chloe Sawyer pulled off a rare double, winning both her Doubles 800 and Open 800 races outright.";
+  "Dublin Winter Race 2 brought 6,252 athletes to the start line across 3,790 entries, with Doubles 800 taking over from Doubles 500 as the day's biggest field. Darren Saunders and Jason Devereux blitzed the fastest finish in 39:11 — the only team under 40 minutes — and Chloe Sawyer pulled off a rare double, winning both her Doubles 800 and Open 800 races outright.";
 
 type PercentileRow = {
   division: string;
@@ -237,7 +237,7 @@ export default function DublinWinterRace2Report() {
     <div className="space-y-10">
       <CalloutStrip />
 
-      <Section title="TL;DR">
+      <Section title="Key Insights">
         <ul className="list-disc space-y-2 pl-5 text-sm text-slate-300">
           <li>
             Doubles 800 was the day's biggest field at 1,157 athletes, edging out Doubles 500
@@ -264,18 +264,21 @@ export default function DublinWinterRace2Report() {
 
       <Section title="Race overview">
         <p className="mb-4 text-sm text-slate-300">
-          3,790 athletes raced across seven divisions. Women outnumbered men 1,970 to 1,309; mixed
-          teams added 511. The largest age bands were 40–49 (901), 30–39 (853) and 20–29 (378).
+          6,252 athletes raced across seven divisions. Each Doubles entry is a team of two and
+          each Relay entry a team of four, so the 3,790 start-line entries represented 6,252
+          people in total. By category, 1,970 women's entries outnumbered 1,309 men's; mixed
+          teams added 511. The largest age bands by entry count were 40–49 (901), 30–39 (853) and
+          20–29 (378).
         </p>
 
-        <h3 className="mb-2 text-xs uppercase tracking-wide text-slate-400">Athletes per division</h3>
+        <h3 className="mb-2 text-xs uppercase tracking-wide text-slate-400">Entries per division</h3>
         <BarChart
           data={ATHLETES_PER_DIVISION}
           max={Math.max(...ATHLETES_PER_DIVISION.map((d) => d.value))}
           labelWidth={140}
         />
 
-        <h3 className="mb-2 mt-6 text-xs uppercase tracking-wide text-slate-400">Gender split</h3>
+        <h3 className="mb-2 mt-6 text-xs uppercase tracking-wide text-slate-400">Entries by gender category</h3>
         <BarChart
           data={GENDER_SPLIT}
           max={Math.max(...GENDER_SPLIT.map((d) => d.value))}
@@ -401,7 +404,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function CalloutStrip() {
   const items = [
-    { label: "Athletes", value: "3,790" },
+    { label: "Athletes", value: "6,252" },
     { label: "Largest field", value: "1,157" },
     { label: "Fastest finish", value: "39:11" },
   ];
