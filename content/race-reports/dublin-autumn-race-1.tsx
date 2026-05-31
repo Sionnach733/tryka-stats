@@ -325,7 +325,7 @@ export default function DublinAutumnRace1Report() {
         <TryZoneTable rows={TRY_ZONE_ROWS} />
       </Section>
 
-      <Section title="Workout stations — gender gap by division">
+      <Section title="Workout stations">
         <p className="mb-6 text-sm text-slate-300">
           Median time on each of the eight workout stations. Pick a division below; bars are
           grouped by gender within each station, and the chart scales to that division. The same
