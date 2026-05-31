@@ -43,9 +43,11 @@ export default function StationPicker({ divisions }: { divisions: StationsByDivi
 
 const GENDER_ORDER: GenderKey[] = ["Men", "Women", "Mixed"];
 
-function opacityFor(g: GenderKey): number {
-  return g === "Men" ? 1 : g === "Women" ? 0.55 : 0.3;
-}
+const GENDER_COLOR: Record<GenderKey, string> = {
+  Men: "#06e38b",   // tryka-green
+  Women: "#60a5fa", // blue-400
+  Mixed: "#f59e0b", // amber-400
+};
 
 function DivisionStationChart({
   division,
@@ -105,8 +107,7 @@ function DivisionStationChart({
                       y={ry}
                       width={xW(r.sec)}
                       height={ROW_H}
-                      fill="#06e38b"
-                      fillOpacity={opacityFor(r.gender)}
+                      fill={GENDER_COLOR[r.gender]}
                     />
                     <text
                       x={xW(r.sec) + 6}
@@ -126,7 +127,7 @@ function DivisionStationChart({
         <g transform={`translate(20, ${cursor + 10})`}>
           {presentGenders.map((g, i) => (
             <g key={g} transform={`translate(${i * 70}, 0)`}>
-              <rect width={11} height={11} fill="#06e38b" fillOpacity={opacityFor(g)} />
+              <rect width={11} height={11} fill={GENDER_COLOR[g]} />
               <text x={16} y={10} fill="#94a3b8" fontSize="11">
                 {g}
               </text>
