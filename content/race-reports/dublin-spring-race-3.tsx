@@ -4,6 +4,9 @@ import StationPicker, { type StationsByDivision } from "@/app/components/Station
 // Percentile groups with fewer than 5 athletes were dropped.
 // Percentile direction: HIGHER = ELITE (99th column = fastest times, 25th = slowest).
 
+export const intro =
+  "Dublin Spring Race 3 drew 4,495 athletes — the biggest field of the Tryka calendar so far. The day belonged to the doubles teams, who accounted for nearly two thirds of the start list and produced the day's fastest single-station times. Josh Flynn and Paul O'Brien won Doubles 800 and went on to set the fastest Lunges and Burpees splits of the entire race.";
+
 type PercentileRow = {
   division: string;
   gender: string;
@@ -231,13 +234,6 @@ const RUN_FADE: { division: string; r1: string; r8: string; delta: number }[] = 
 export default function DublinSpringRace3Report() {
   return (
     <div className="space-y-10">
-      <p className="text-sm leading-relaxed text-slate-300">
-        Dublin Spring Race 3 drew 4,495 athletes — the biggest field of the Tryka calendar so far.
-        The day belonged to the doubles teams, who accounted for nearly two thirds of the start list
-        and produced the day's fastest single-station times. Josh Flynn and Paul O'Brien won
-        Doubles 800 and went on to set the fastest Lunges and Burpees splits of the entire race.
-      </p>
-
       <CalloutStrip />
 
       <Section title="TL;DR">

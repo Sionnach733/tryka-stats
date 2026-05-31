@@ -57,7 +57,7 @@ export type StationFieldRow = {
 
 export type ResultIdRow = { id: number };
 
-export type RaceSummary = { race_name: string; divisions: string };
+export type RaceSummary = { race_name: string };
 
 export type FinishTimeRow = { id: number; overall_time: string | null };
 
@@ -266,11 +266,10 @@ export function getDistinctDivisions(): string[] {
 function getAllRacesStmtFn() {
   if (!allRacesStmt) {
     allRacesStmt = getDb().prepare<[], RaceSummary>(`
-      SELECT race_name, GROUP_CONCAT(DISTINCT division) AS divisions
+      SELECT DISTINCT race_name
       FROM events
       WHERE division NOT LIKE 'TRYKA JNR%'
         AND division != 'TRYKA CLAN FITNESS'
-      GROUP BY race_name
       ORDER BY race_name
     `);
   }

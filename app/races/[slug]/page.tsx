@@ -7,10 +7,15 @@ import { slugify } from "@/lib/format";
 
 type Props = { params: Promise<{ slug: string }> };
 
-async function loadReport(slug: string): Promise<ComponentType | null> {
+type ReportModule = {
+  default: ComponentType;
+  intro?: string;
+};
+
+async function loadReport(slug: string): Promise<ReportModule | null> {
   try {
-    const mod = await import(`@/content/race-reports/${slug}`);
-    return mod.default;
+    const mod = (await import(`@/content/race-reports/${slug}`)) as ReportModule;
+    return mod;
   } catch {
     return null;
   }
@@ -31,7 +36,8 @@ export default async function RaceReportPage({ params }: Props) {
   const race = getAllRaces().find((r) => slugify(r.race_name) === slug);
   if (!race) notFound();
 
-  const ReportComponent = await loadReport(slug);
+  const report = await loadReport(slug);
+  const ReportComponent = report?.default;
 
   return (
     <div>
@@ -45,7 +51,9 @@ export default async function RaceReportPage({ params }: Props) {
         <h1 className="text-2xl font-bold uppercase tracking-wider text-tryka-green">
           {race.race_name}
         </h1>
-        <p className="mt-1 text-sm text-slate-400">{race.divisions}</p>
+        {report?.intro ? (
+          <p className="mt-3 text-sm leading-relaxed text-slate-300">{report.intro}</p>
+        ) : null}
       </header>
 
       {ReportComponent ? (
