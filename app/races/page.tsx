@@ -3,6 +3,8 @@ import Link from "next/link";
 import { getAllRaces } from "@/lib/queries";
 import { slugify } from "@/lib/format";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "Race Reports",
   description: "Race reports for Tryka events.",

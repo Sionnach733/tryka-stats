@@ -5,6 +5,8 @@ import { notFound } from "next/navigation";
 import { getAllRaces } from "@/lib/queries";
 import { slugify } from "@/lib/format";
 
+export const dynamic = 'force-dynamic';
+
 type Props = { params: Promise<{ slug: string }> };
 
 type ReportModule = {
