@@ -57,6 +57,8 @@ export type StationFieldRow = {
 
 export type ResultIdRow = { id: number };
 
+export type RaceSummary = { race_name: string; divisions: string };
+
 export type FinishTimeRow = { id: number; overall_time: string | null };
 
 export type RefinedSplitWithResultRow = {
@@ -81,6 +83,7 @@ let finishTimesByDivGenderStmt:
 let distinctDivisionsStmt:
   | Database.Statement<[], { division: string }>
   | null = null;
+let allRacesStmt: Database.Statement<[], RaceSummary> | null = null;
 
 function getSearchStmt() {
   if (!searchStmt) {
@@ -258,6 +261,24 @@ export function getDistinctDivisions(): string[] {
   return getDistinctDivisionsStmt()
     .all()
     .map((r) => r.division);
+}
+
+function getAllRacesStmtFn() {
+  if (!allRacesStmt) {
+    allRacesStmt = getDb().prepare<[], RaceSummary>(`
+      SELECT race_name, GROUP_CONCAT(DISTINCT division) AS divisions
+      FROM events
+      WHERE division NOT LIKE 'TRYKA JNR%'
+        AND division != 'TRYKA CLAN FITNESS'
+      GROUP BY race_name
+      ORDER BY race_name
+    `);
+  }
+  return allRacesStmt;
+}
+
+export function getAllRaces(): RaceSummary[] {
+  return getAllRacesStmtFn().all();
 }
 
 export function getRefinedSplitsForResults(

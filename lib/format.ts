@@ -28,6 +28,10 @@ export function parseTime(t: string | null | undefined): number | null {
   return null;
 }
 
+export function slugify(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
 /** Format seconds as "MM:SS". */
 export function formatMmSs(totalSeconds: number): string {
   const rounded = Math.round(totalSeconds);

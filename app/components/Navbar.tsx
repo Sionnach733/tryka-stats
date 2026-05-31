@@ -7,6 +7,7 @@ const LINKS = [
   { href: "/", label: "Home" },
   { href: "/stations", label: "Stations" },
   { href: "/calculator", label: "Race Calculator" },
+  { href: "/races", label: "Race Reports" },
 ];
 
 function isActive(pathname: string, href: string): boolean {
