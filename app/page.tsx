@@ -36,7 +36,7 @@ export default async function HomePage({
           <li>
             <Link
               href="/races"
-              className="group block rounded-lg border border-tryka-navy-light bg-tryka-navy-light p-4 shadow-sm transition hover:border-tryka-green focus:outline-none focus:ring-1 focus:ring-tryka-green"
+              className="group block h-full rounded-lg border border-tryka-navy-light bg-tryka-navy-light p-4 shadow-sm transition hover:border-tryka-green focus:outline-none focus:ring-1 focus:ring-tryka-green"
             >
               <h3 className="text-sm font-semibold uppercase tracking-wide group-hover:text-tryka-green">
                 Race Reports
@@ -50,7 +50,7 @@ export default async function HomePage({
           <li>
             <Link
               href="/calculator"
-              className="group block rounded-lg border border-tryka-navy-light bg-tryka-navy-light p-4 shadow-sm transition hover:border-tryka-green focus:outline-none focus:ring-1 focus:ring-tryka-green"
+              className="group block h-full rounded-lg border border-tryka-navy-light bg-tryka-navy-light p-4 shadow-sm transition hover:border-tryka-green focus:outline-none focus:ring-1 focus:ring-tryka-green"
             >
               <h3 className="text-sm font-semibold uppercase tracking-wide group-hover:text-tryka-green">
                 Race Calculator
@@ -64,7 +64,7 @@ export default async function HomePage({
           <li>
             <Link
               href="/stations"
-              className="group block rounded-lg border border-tryka-navy-light bg-tryka-navy-light p-4 shadow-sm transition hover:border-tryka-green focus:outline-none focus:ring-1 focus:ring-tryka-green"
+              className="group block h-full rounded-lg border border-tryka-navy-light bg-tryka-navy-light p-4 shadow-sm transition hover:border-tryka-green focus:outline-none focus:ring-1 focus:ring-tryka-green"
             >
               <h3 className="text-sm font-semibold uppercase tracking-wide group-hover:text-tryka-green">
                 Stations
