@@ -12,10 +12,8 @@ export const STATIONS: StationContent[] = [
     slug: "ski-erg",
     name: "SkiErg",
     tips: [
-      "Set your damper before the judge resets the monitor — you can change it during the effort too.",
-      "Use a double-pole rhythm: hinge at the hips and drive the handles down past your thighs, not just your waist.",
       "Keep your feet shoulder-width apart and stay on the platform — stepping off is a penalty.",
-      "Raise your arm clearly and wait for judge confirmation before unclipping — leaving early is a time penalty.",
+      "Raise your arm clearly and wait for judge confirmation before leaving — leaving early is a time penalty.",
     ],
     standardsIndividual: [
       "The machine monitor will be set to zero by the judge before use.",
@@ -60,11 +58,11 @@ export const STATIONS: StationContent[] = [
     slug: "ramfit-thrusters",
     name: "Ramfit Thrusters",
     tips: [
-      "Press the Start button on the AI judging screen before your first rep — unrepped sets won't count.",
+      "Press the Start button on the AI judging screen before your first rep",
+      "AI Judges will be available in the warmup area, make sure to practice the timing to ensure clean reps. Sometimes the judge won't count a rep if you are moving too fast!",
       "Squat to at least parallel (below parallel for Pro division) and lock out fully overhead on every rep.",
-      "Break the 60 reps into manageable sets — the RAM can be placed on the ground at any time.",
       "Pace yourself: 6 sets of 10 with short rests is often faster than grinding through fatigue.",
-      "Return the RAM neatly to the rack before leaving — judges are watching.",
+      "Doubles only: Make sure to stand in the designated spot when resting so you don't block the judges view of the working athlete.",
     ],
     standardsIndividual: [
       "This station uses AI-assisted judging. The athlete must press Start on the screen when arriving at their designated lane before beginning; failing to press Start will result in reps not being counted.",
@@ -107,8 +105,6 @@ export const STATIONS: StationContent[] = [
     slug: "sled-pull",
     name: "Sled Pull",
     tips: [
-      "Stay planted in your 1m box — you cannot step on any of the 4 lines of the box.",
-      "Pull hand-over-hand in a smooth, continuous rhythm; jerky pulls waste energy.",
       "Keep the rope in your lane at all times — rope violations carry penalties.",
       "Stay standing throughout; sitting or kneeling is not permitted.",
       "When changing over with your doubles partner, place the rope on the ground — your partner must pick it up themselves.",
@@ -133,9 +129,9 @@ export const STATIONS: StationContent[] = [
     slug: "rowing",
     name: "Rowing",
     tips: [
+      "Set your damper as soon as you arrive at the rower.",
       "Secure your feet in the straps completely before picking up the handle — feet not strapped in before grabbing the handle is a penalty.",
       "Drive with your legs first, then lean back, then pull the handle to your lower chest.",
-      "Set your damper before the judge resets the monitor.",
       "Do not touch the monitor screen — this is a time penalty.",
       "Raise your arm clearly when done and wait for judge confirmation before leaving the machine.",
     ],
