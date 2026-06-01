@@ -31,7 +31,6 @@ export default function StationsIndexPage() {
               <h2 className="text-sm font-semibold uppercase tracking-wide group-hover:text-tryka-green">
                 {station.name}
               </h2>
-              <p className="mt-1 text-xs text-slate-400">{station.tagline}</p>
             </Link>
           </li>
         ))}
