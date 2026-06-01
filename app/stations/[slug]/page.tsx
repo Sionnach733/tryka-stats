@@ -19,7 +19,7 @@ export async function generateMetadata({
   if (!station) return {};
   return {
     title: `${station.name} – Tips & Movement Standards`,
-    description: `${station.tagline} Tryka movement standards for ${station.name} (individual and doubles).`,
+    description: `Tryka movement standards for ${station.name} (individual and doubles).`,
   };
 }
 
@@ -44,7 +44,6 @@ export default async function StationDetailPage({
         <h1 className="text-2xl font-bold uppercase tracking-wider text-tryka-green">
           {station.name}
         </h1>
-        <p className="mt-2 text-sm text-slate-300">{station.tagline}</p>
       </header>
 
       <section className="mb-8 rounded-lg border border-tryka-navy-light bg-tryka-navy-light p-4 shadow-sm">

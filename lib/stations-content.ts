@@ -1,7 +1,6 @@
 export type StationContent = {
   slug: string;
   name: string;
-  tagline: string;
   tips: string[];
   tipsTable?: { headers: string[]; rows: string[][] };
   standardsIndividual: string[];
@@ -12,7 +11,6 @@ export const STATIONS: StationContent[] = [
   {
     slug: "ski-erg",
     name: "SkiErg",
-    tagline: "Drive through the hips, finish at the thighs.",
     tips: [
       "Set your damper before the judge resets the monitor — you can change it during the effort too.",
       "Use a double-pole rhythm: hinge at the hips and drive the handles down past your thighs, not just your waist.",
@@ -36,7 +34,6 @@ export const STATIONS: StationContent[] = [
   {
     slug: "kb-farmers-carry",
     name: "KB Farmers Carry",
-    tagline: "Tight grip, tall posture, short fast steps.",
     tips: [
       "Collect the correct kettlebells for your division before entering your lane — using the wrong weight is an instant DQ.",
       "Keep your arms fully extended at your sides with handles outside your thighs at all times.",
@@ -62,7 +59,6 @@ export const STATIONS: StationContent[] = [
   {
     slug: "ramfit-thrusters",
     name: "Ramfit Thrusters",
-    tagline: "Full squat, full lockout — every rep counts.",
     tips: [
       "Press the Start button on the AI judging screen before your first rep — unrepped sets won't count.",
       "Squat to at least parallel (below parallel for Pro division) and lock out fully overhead on every rep.",
@@ -87,7 +83,6 @@ export const STATIONS: StationContent[] = [
   {
     slug: "sled-push",
     name: "Sled Push",
-    tagline: "Low body angle, drive through the toes.",
     tips: [
       "Start with your hips low and body at a steep forward angle — power comes from leg drive, not the upper body.",
       "Push the sled completely over the 12.5m turnaround line before reversing direction; short-turning is penalised.",
@@ -111,7 +106,6 @@ export const STATIONS: StationContent[] = [
   {
     slug: "sled-pull",
     name: "Sled Pull",
-    tagline: "Hand-over-hand, stay grounded, control the rope.",
     tips: [
       "Stay planted in your 1m box — you cannot step on any of the 4 lines of the box.",
       "Pull hand-over-hand in a smooth, continuous rhythm; jerky pulls waste energy.",
@@ -138,7 +132,6 @@ export const STATIONS: StationContent[] = [
   {
     slug: "rowing",
     name: "Rowing",
-    tagline: "Legs, back, arms — in that order, every stroke.",
     tips: [
       "Secure your feet in the straps completely before picking up the handle — feet not strapped in before grabbing the handle is a penalty.",
       "Drive with your legs first, then lean back, then pull the handle to your lower chest.",
@@ -166,7 +159,6 @@ export const STATIONS: StationContent[] = [
   {
     slug: "lunges",
     name: "Lunges",
-    tagline: "Back knee touches, front heel stays planted.",
     tips: [
       "Load the RAM onto your upper back without assistance before entering the course.",
       "Drive your trailing knee all the way to the ground on every rep — partial contact is a no-rep.",
@@ -197,7 +189,6 @@ export const STATIONS: StationContent[] = [
   {
     slug: "burpees",
     name: "Burpees",
-    tagline: "Chest to floor, full extension, repeat.",
     tips: [
       "Use the full 50 cm hand-placement allowance: you can place your hands up to 50 cm in front of your feet when dropping into the burpee — maximising this gives you a longer, more powerful takeoff position.",
       "Tryka allows 50 cm; Hyrox only allows 30 cm. If you train for Hyrox events, consciously practise pushing that extra 20 cm in Tryka races."
