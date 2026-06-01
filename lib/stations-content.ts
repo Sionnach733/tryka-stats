@@ -3,6 +3,7 @@ export type StationContent = {
   name: string;
   tagline: string;
   tips: string[];
+  tipsTable?: { headers: string[]; rows: string[][] };
   standardsIndividual: string[];
   standardsDoubles: string[];
 };
@@ -198,13 +199,17 @@ export const STATIONS: StationContent[] = [
     name: "Burpees",
     tagline: "Chest to floor, full extension, repeat.",
     tips: [
-      "Get your hands behind the start line before your chest touches the floor on the very first rep.",
-      "When stepping or jumping back from the burpee, do not let your feet go beyond your fingertips.",
-      "Feet must be parallel at takeoff — no staggered stance.",
-      "Land with both feet parallel and controlled before the next burpee.",
-      "Aim for a consistent jump length — a shorter, controlled jump is faster than a long jump that breaks your rhythm.",
-      "No shuffles or extra steps between jumps; one warning is given before time penalties begin.",
+      "Use the full 50 cm hand-placement allowance: you can place your hands up to 50 cm in front of your feet when dropping into the burpee — maximising this gives you a longer, more powerful takeoff position.",
+      "Tryka allows 50 cm; Hyrox only allows 30 cm. If you train for Hyrox events, consciously practise pushing that extra 20 cm in Tryka races."
     ],
+    tipsTable: {
+      headers: ["Hand placement", "Jump distance", "Reps to cover 80 m"],
+      rows: [
+        ["Hyrox-style (30 cm)", "~1.5 m", "54 reps"],
+        ["Full allowance (50 cm)", "~1.7 m", "48 reps"],
+        ["Saving", "", "6 fewer reps"],
+      ],
+    },
     standardsIndividual: [
       "Hands must be behind the start line and chest must touch the floor for each burpee.",
       "When jumping or stepping out of any burpee, the feet cannot go beyond the athlete's fingertips.",

@@ -56,6 +56,42 @@ export default async function StationDetailPage({
             <li key={i}>{tip}</li>
           ))}
         </ul>
+        {station.tipsTable && (
+          <div className="mt-4 overflow-x-auto rounded-lg border border-tryka-navy-light">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-tryka-navy">
+                  {station.tipsTable.headers.map((h, i) => (
+                    <th
+                      key={i}
+                      className="px-3 py-2 text-left text-xs uppercase tracking-wide text-slate-400"
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-tryka-navy-light">
+                {station.tipsTable.rows.map((row, i) => (
+                  <tr
+                    key={i}
+                    className={
+                      i === station.tipsTable!.rows.length - 1
+                        ? "text-tryka-green"
+                        : "hover:bg-tryka-navy-light/50"
+                    }
+                  >
+                    {row.map((cell, j) => (
+                      <td key={j} className="px-3 py-2 tabular-nums">
+                        {cell}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
       <section className="rounded-lg border border-tryka-navy-light bg-tryka-navy-light p-4 shadow-sm">
