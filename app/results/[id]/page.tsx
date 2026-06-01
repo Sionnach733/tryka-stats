@@ -13,10 +13,10 @@ import { displayGender, displayMembers, parseMembers, parseTime, formatMmSs, for
 import type { RefinedSplit } from "@/lib/queries";
 import { WORKOUT_STATIONS, PACE_DISTANCES, RUN_SPLITS } from "@/lib/constants";
 import ResultTabs from "@/app/components/ResultTabs";
-import StationsGrid from "@/app/components/StationsGrid";
 import type { StationData } from "@/app/components/StationsGrid";
-import RunsGrid from "@/app/components/RunsGrid";
 import type { RunData } from "@/app/components/RunsGrid";
+import StationsTab from "@/app/components/StationsTab";
+import RunsTab from "@/app/components/RunsTab";
 import CompareButton from "@/app/components/CompareButton";
 import ComparisonTiles from "@/app/components/ComparisonTiles";
 import type { ComparisonTotals } from "@/app/components/ComparisonTiles";
@@ -70,6 +70,12 @@ export default async function ResultPage({ params, searchParams }: { params: Par
 
   const stationData = buildStationData(refined, result.event_id, result.gender);
   const runData = buildRunData(refined, result.event_id, result.gender);
+  const stationDataByAge = result.age_group
+    ? buildStationData(refined, result.event_id, result.gender, result.age_group)
+    : null;
+  const runDataByAge = result.age_group
+    ? buildRunData(refined, result.event_id, result.gender, result.age_group)
+    : null;
 
   // Comparison data
   const compareId = compare ? Number(compare) : null;
@@ -188,8 +194,20 @@ export default async function ResultPage({ params, searchParams }: { params: Par
             numericCols={[1, 2, 3]}
           />
         }
-        stationsContent={<StationsGrid stations={stationData} />}
-        runsContent={<RunsGrid runs={runData} />}
+        stationsContent={
+          <StationsTab
+            overall={stationData}
+            byAgeGroup={stationDataByAge}
+            ageGroupLabel={result.age_group}
+          />
+        }
+        runsContent={
+          <RunsTab
+            overall={runData}
+            byAgeGroup={runDataByAge}
+            ageGroupLabel={result.age_group}
+          />
+        }
       />
       </Suspense>
     </div>
@@ -388,10 +406,11 @@ function buildStationData(
   refined: RefinedSplit[],
   eventId: number,
   gender: string | null,
+  ageGroup?: string | null,
 ): StationData[] {
   if (!gender) return [];
 
-  const fieldRows = getStationFieldTimes(eventId, gender);
+  const fieldRows = getStationFieldTimes(eventId, gender, ageGroup);
 
   // Group field times by station, parsed to seconds
   const fieldByStation = new Map<string, number[]>();
@@ -446,10 +465,11 @@ function buildRunData(
   refined: RefinedSplit[],
   eventId: number,
   gender: string | null,
+  ageGroup?: string | null,
 ): RunData[] {
   if (!gender) return [];
 
-  const fieldRows = getRunFieldTimes(eventId, gender);
+  const fieldRows = getRunFieldTimes(eventId, gender, ageGroup);
 
   const fieldByRun = new Map<string, number[]>();
   for (const row of fieldRows) {

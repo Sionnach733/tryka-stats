@@ -75,7 +75,13 @@ let detailStmt: Database.Statement<[number], ResultDetail> | null = null;
 let refinedStmt: Database.Statement<[number], RefinedSplit> | null = null;
 let rawStmt: Database.Statement<[number], RawSplit> | null = null;
 let stationFieldStmt: Database.Statement<[number, string], StationFieldRow> | null = null;
+let stationFieldByAgeStmt:
+  | Database.Statement<[number, string, string], StationFieldRow>
+  | null = null;
 let runFieldStmt: Database.Statement<[number, string], StationFieldRow> | null = null;
+let runFieldByAgeStmt:
+  | Database.Statement<[number, string, string], StationFieldRow>
+  | null = null;
 let allIdsStmt: Database.Statement<[], ResultIdRow> | null = null;
 let finishTimesByDivGenderStmt:
   | Database.Statement<[string, string], FinishTimeRow>
@@ -170,6 +176,22 @@ function getStationFieldStmt() {
   return stationFieldStmt;
 }
 
+function getStationFieldByAgeStmt() {
+  if (!stationFieldByAgeStmt) {
+    stationFieldByAgeStmt = getDb().prepare<[number, string, string], StationFieldRow>(`
+      SELECT rs.split_name, rs.time
+      FROM refined_splits rs
+      JOIN results r ON rs.result_id = r.id
+      WHERE r.event_id = ? AND r.gender = ? AND r.age_group = ?
+        AND rs.split_name IN ('SkiErg','KB Farmers Carry','Ramfit Thrusters',
+          'Sled Push','Sled Pull','Rowing','Lunges','Burpees')
+        AND rs.time IS NOT NULL
+      ORDER BY rs.split_name, rs.time
+    `);
+  }
+  return stationFieldByAgeStmt;
+}
+
 function getRunFieldStmt() {
   if (!runFieldStmt) {
     runFieldStmt = getDb().prepare<[number, string], StationFieldRow>(`
@@ -184,6 +206,22 @@ function getRunFieldStmt() {
     `);
   }
   return runFieldStmt;
+}
+
+function getRunFieldByAgeStmt() {
+  if (!runFieldByAgeStmt) {
+    runFieldByAgeStmt = getDb().prepare<[number, string, string], StationFieldRow>(`
+      SELECT rs.split_name, rs.time
+      FROM refined_splits rs
+      JOIN results r ON rs.result_id = r.id
+      WHERE r.event_id = ? AND r.gender = ? AND r.age_group = ?
+        AND rs.split_name IN ('Running 1','Running 2','Running 3','Running 4',
+          'Running 5','Running 6','Running 7','Running 8','TRY Zone Total')
+        AND rs.time IS NOT NULL
+      ORDER BY rs.split_name, rs.time
+    `);
+  }
+  return runFieldByAgeStmt;
 }
 
 export function searchAthletes(query: string): SearchHit[] {
@@ -204,11 +242,25 @@ export function getRawSplits(resultId: number): RawSplit[] {
   return getRawStmt().all(resultId);
 }
 
-export function getStationFieldTimes(eventId: number, gender: string): StationFieldRow[] {
+export function getStationFieldTimes(
+  eventId: number,
+  gender: string,
+  ageGroup?: string | null,
+): StationFieldRow[] {
+  if (ageGroup) {
+    return getStationFieldByAgeStmt().all(eventId, gender, ageGroup);
+  }
   return getStationFieldStmt().all(eventId, gender);
 }
 
-export function getRunFieldTimes(eventId: number, gender: string): StationFieldRow[] {
+export function getRunFieldTimes(
+  eventId: number,
+  gender: string,
+  ageGroup?: string | null,
+): StationFieldRow[] {
+  if (ageGroup) {
+    return getRunFieldByAgeStmt().all(eventId, gender, ageGroup);
+  }
   return getRunFieldStmt().all(eventId, gender);
 }
 
