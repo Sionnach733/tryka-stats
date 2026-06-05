@@ -68,6 +68,34 @@ export type RefinedSplitWithResultRow = {
   time: string | null;
 };
 
+export type DivisionRecord = {
+  id: number;
+  members: string;
+  gender: string | null;
+  age_group: string | null;
+  overall_time: string;
+  race_name: string;
+  division: string;
+};
+
+// Tryka renamed "TRYKA DOUBLES PRO" -> "TRYKA PRO DOUBLES" between
+// Winter and Spring 2026. Map the older spelling to the canonical one
+// so records pool across both.
+const DIVISION_ALIASES: Record<string, string> = {
+  "TRYKA DOUBLES PRO": "TRYKA PRO DOUBLES",
+};
+
+export function canonicalDivision(name: string): string {
+  return DIVISION_ALIASES[name] ?? name;
+}
+
+function divisionDbNames(canonical: string): string[] {
+  const aliases = Object.entries(DIVISION_ALIASES)
+    .filter(([, v]) => v === canonical)
+    .map(([k]) => k);
+  return [canonical, ...aliases];
+}
+
 // Lazily prepared statements — cached after first call to avoid
 // opening the database at import time (which breaks Next.js builds).
 let searchStmt: Database.Statement<[string], SearchHit> | null = null;
@@ -89,7 +117,13 @@ let finishTimesByDivGenderStmt:
 let distinctDivisionsStmt:
   | Database.Statement<[], { division: string }>
   | null = null;
+let recordEligibleDivisionsStmt:
+  | Database.Statement<[], { division: string }>
+  | null = null;
 let allRacesStmt: Database.Statement<[], RaceSummary> | null = null;
+let divisionRecordsStmt:
+  | Database.Statement<[string], DivisionRecord>
+  | null = null;
 
 function getSearchStmt() {
   if (!searchStmt) {
@@ -310,9 +344,27 @@ function getDistinctDivisionsStmt() {
 }
 
 export function getDistinctDivisions(): string[] {
-  return getDistinctDivisionsStmt()
-    .all()
-    .map((r) => r.division);
+  const raw = getDistinctDivisionsStmt().all().map((r) => r.division);
+  return Array.from(new Set(raw.map(canonicalDivision))).sort();
+}
+
+function getRecordEligibleDivisionsStmt() {
+  if (!recordEligibleDivisionsStmt) {
+    recordEligibleDivisionsStmt = getDb().prepare<[], { division: string }>(`
+      SELECT DISTINCT e.division
+      FROM events e
+      JOIN results r ON r.event_id = e.id
+      WHERE r.overall_time IS NOT NULL
+        AND r.disqual_reason IS NULL
+        AND r.age_group IS NOT NULL
+    `);
+  }
+  return recordEligibleDivisionsStmt;
+}
+
+export function getRecordEligibleDivisions(): string[] {
+  const raw = getRecordEligibleDivisionsStmt().all().map((r) => r.division);
+  return Array.from(new Set(raw.map(canonicalDivision))).sort();
 }
 
 function getAllRacesStmtFn() {
@@ -330,6 +382,35 @@ function getAllRacesStmtFn() {
 
 export function getAllRaces(): RaceSummary[] {
   return getAllRacesStmtFn().all();
+}
+
+function getDivisionRecordsStmt() {
+  if (!divisionRecordsStmt) {
+    divisionRecordsStmt = getDb().prepare<[string], DivisionRecord>(`
+      WITH ranked AS (
+        SELECT r.id, r.members, r.gender, r.age_group, r.overall_time,
+               e.race_name, e.division,
+               ROW_NUMBER() OVER (
+                 PARTITION BY r.gender, r.age_group
+                 ORDER BY r.overall_time ASC
+               ) AS rn
+        FROM results r
+        JOIN events e ON r.event_id = e.id
+        WHERE e.division IN (SELECT value FROM json_each(?))
+          AND r.overall_time IS NOT NULL
+          AND r.disqual_reason IS NULL
+          AND r.age_group IS NOT NULL
+      )
+      SELECT id, members, gender, age_group, overall_time, race_name, division
+      FROM ranked
+      WHERE rn = 1
+    `);
+  }
+  return divisionRecordsStmt;
+}
+
+export function getDivisionRecords(division: string): DivisionRecord[] {
+  return getDivisionRecordsStmt().all(JSON.stringify(divisionDbNames(division)));
 }
 
 export function getRefinedSplitsForResults(
