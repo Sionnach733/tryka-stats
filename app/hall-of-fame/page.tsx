@@ -6,6 +6,7 @@ import {
   getRecordEligibleDivisions,
 } from "@/lib/queries";
 import { displayGender, displayMembers, parseMembers } from "@/lib/format";
+import DivisionSelect from "@/app/components/DivisionSelect";
 
 export const dynamic = "force-dynamic";
 
@@ -57,30 +58,9 @@ export default async function HallOfFamePage({
         </p>
       </header>
 
-      <form method="GET" className="mb-6 flex flex-wrap items-end gap-3">
-        <label className="flex flex-col gap-1">
-          <span className="text-xs uppercase tracking-wide text-slate-400">
-            Division
-          </span>
-          <select
-            name="division"
-            defaultValue={selected}
-            className="rounded-lg border border-tryka-navy-light bg-tryka-navy-light px-3 py-2 text-sm text-white shadow-sm focus:border-tryka-green focus:outline-none focus:ring-1 focus:ring-tryka-green"
-          >
-            {divisions.map((d) => (
-              <option key={d} value={d}>
-                {d}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button
-          type="submit"
-          className="rounded-md bg-tryka-green px-3 py-1.5 text-sm font-medium text-tryka-navy hover:bg-tryka-green/90"
-        >
-          Show records
-        </button>
-      </form>
+      <div className="mb-6">
+        <DivisionSelect divisions={divisions} selected={selected} />
+      </div>
 
       {records.length === 0 ? (
         <p className="text-sm text-slate-400">
