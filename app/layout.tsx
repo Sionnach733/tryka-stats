@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 
@@ -79,6 +80,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </svg>
                 tryka.stats
               </a>
+            </p>
+            <p className="mt-2">
+              <Link href="/contact" className="hover:text-tryka-green transition-colors">
+                Contact
+              </Link>
             </p>
             <a
               href={BMC_URL}
