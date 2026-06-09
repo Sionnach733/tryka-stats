@@ -208,7 +208,7 @@ export default async function CalculatorPage({
             <table className="w-full text-sm">
               <thead className="bg-tryka-navy-light text-xs uppercase tracking-wide text-slate-400">
                 <tr>
-                  <th className="px-4 py-2 text-left">Segment</th>
+                  <th className="px-4 py-2 text-left">Split</th>
                   <th className="px-4 py-2 text-right">Predicted time</th>
                 </tr>
               </thead>
