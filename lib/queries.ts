@@ -380,8 +380,21 @@ function getAllRacesStmtFn() {
   return allRacesStmt;
 }
 
+// Race names end in their series number ("DUBLIN WINTER RACE 2", "LONDON RACE 5"),
+// so order by that number rather than alphabetically.
+function raceNumber(name: string): number {
+  const m = name.match(/(\d+)\s*$/);
+  return m ? Number(m[1]) : Number.MAX_SAFE_INTEGER;
+}
+
 export function getAllRaces(): RaceSummary[] {
-  return getAllRacesStmtFn().all();
+  return getAllRacesStmtFn()
+    .all()
+    .sort(
+      (a, b) =>
+        raceNumber(a.race_name) - raceNumber(b.race_name) ||
+        a.race_name.localeCompare(b.race_name),
+    );
 }
 
 function getDivisionRecordsStmt() {

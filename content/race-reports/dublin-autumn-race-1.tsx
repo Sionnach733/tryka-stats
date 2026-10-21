@@ -5,7 +5,7 @@ import StationPicker, { type StationsByDivision } from "@/app/components/Station
 // Percentile direction: HIGHER = ELITE (99th column = fastest times, 25th = slowest).
 
 export const intro =
-  "Dublin Autumn Race 1 was the start of the series — 3,796 athletes across 2,316 entries, the smallest of the three Dublin races but where the patterns were set. Doubles 800 swept the day's station records, Open 500 drew twice as many women as men, and Ellie Carmody won Pro Women in 56:50, kicking off what became a multi-race winning streak.";
+  "Dublin Autumn Race 1 was the start of the series — 3,796 athletes across 2,316 entries, the smallest of Dublin Autumn Race 1, Dublin Winter Race 2 and Dublin Spring Race 3, but where the patterns were set. Doubles 800 swept the day's station records, Open 500 drew twice as many women as men, and Ellie Carmody won Pro Women in 56:50, kicking off what became a multi-race winning streak.";
 
 type PercentileRow = {
   division: string;
@@ -245,10 +245,12 @@ export default function DublinAutumnRace1Report() {
           </li>
           <li>
             Open 500 drew more than two women for every man — 183 Women vs 87 Men — the most
-            gender-skewed entry-level field of the three Dublin races.
+            gender-skewed entry-level field of Dublin Autumn Race 1, Dublin Winter Race 2 and
+            Dublin Spring Race 3.
           </li>
           <li>
-            Open 500 Men's pace fade was the worst across all three Dublin races: an 86-second
+            Open 500 Men's pace fade was the worst across Dublin Autumn Race 1, Dublin Winter Race 2 and
+            Dublin Spring Race 3: an 86-second
             median slowdown from Run 1 to Run 8.
           </li>
           <li>
@@ -265,8 +267,8 @@ export default function DublinAutumnRace1Report() {
 
       <Section title="Race overview">
         <p className="mb-4 text-sm text-slate-300">
-          3,796 athletes raced across seven divisions — the smallest field of the three Dublin
-          races. Each Doubles entry is a team of two and each Relay entry a team of four, so the
+          3,796 athletes raced across seven divisions — the smallest field of Dublin Autumn Race 1,
+          Dublin Winter Race 2 and Dublin Spring Race 3. Each Doubles entry is a team of two and each Relay entry a team of four, so the
           2,316 start-line entries represented 3,796 people in total. By category, 1,177 women's
           entries outnumbered 831 men's; mixed teams added 308. The largest age bands by entry
           count were 40–49 (513), 30–39 (495) and 20–29 (198).
@@ -300,7 +302,8 @@ export default function DublinAutumnRace1Report() {
         <p className="mb-4 text-sm text-slate-300">
           The eight running laps add up to between 4 km (the 500 formats) and 6.4 km (the 800
           formats, Pro and Relay). Pro Men ran the day's fastest median pace at 4:33/km — narrowly
-          edging Doubles Pro Men at 4:38/km, the only race of the three Dublin events where the
+          edging Doubles Pro Men at 4:38/km, the only one of Dublin Autumn Race 1, Dublin Winter Race 2 and Dublin
+          Spring Race 3 where the
           individual elites outran the doubles elites on pace.
         </p>
 
@@ -329,9 +332,9 @@ export default function DublinAutumnRace1Report() {
         <p className="mb-6 text-sm text-slate-300">
           Median time on each of the eight workout stations. Pick a division below; bars are
           grouped by gender within each station, and the chart scales to that division. The same
-          Lunges and Thrusters gender flip that appears in the other Dublin reports is already
-          here in Autumn 1 — women medianed faster on both stations in Open 500 and Open 800. The
-          pattern has now held across all three races.
+          Lunges and Thrusters gender flip that appears in the Dublin Winter Race 2 and Dublin Spring
+          Race 3 reports is already here in Dublin Autumn Race 1 — women medianed faster on both
+          stations in Open 500 and Open 800. The pattern has now held across all three.
         </p>
 
         <StationPicker divisions={STATION_DATA_BY_DIVISION} />
@@ -378,19 +381,19 @@ export default function DublinAutumnRace1Report() {
             seven of eight stations.
           </li>
           <li>
-            The pace-fade hierarchy is consistent with the other Dublin races, but Open 500 Men's
+            The pace-fade hierarchy is consistent with Dublin Winter Race 2 and Dublin Spring Race 3, but Open 500 Men's
             86-second slowdown is the worst single bucket across any race. Pacing discipline
             tracks with format experience.
           </li>
           <li>
             The Open 500 women-to-men ratio of more than 2:1 stands out — by the time the format
-            settles into Winter and Spring, the gap narrows. The entry-level individual race was
+            settles into Dublin Winter Race 2 and Dublin Spring Race 3, the gap narrows. The entry-level individual race was
             women's territory at the start of the series.
           </li>
           <li>
             Ellie Carmody's Pro Women win here in 56:50 was the start of a streak — she'd go on
-            to win Doubles Pro Women in both Winter Race 2 (with Grace Fitzgerald) and Spring
-            Race 3. The most consistent elite performer of the three Dublin races.
+            to win Doubles Pro Women in both Dublin Winter Race 2 (with Grace Fitzgerald) and
+            Dublin Spring Race 3. The most consistent elite performer across all three.
           </li>
         </ul>
       </Section>

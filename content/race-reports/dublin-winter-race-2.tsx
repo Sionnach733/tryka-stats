@@ -241,7 +241,7 @@ export default function DublinWinterRace2Report() {
         <ul className="list-disc space-y-2 pl-5 text-sm text-slate-300">
           <li>
             Doubles 800 was the day's biggest field at 1,157 athletes, edging out Doubles 500
-            (1,060) — a flip from the Spring race.
+            (1,060) — a flip from Dublin Spring Race 3.
           </li>
           <li>
             Chloe Sawyer won Doubles 800 Women in 50:01 and then went on to win Open 800 Women in
@@ -299,8 +299,8 @@ export default function DublinWinterRace2Report() {
         <p className="mb-4 text-sm text-slate-300">
           The eight running laps add up to between 4 km (the 500 formats) and 6.4 km (the 800
           formats, Pro and Relay). Doubles Pro Men ran the day's fastest median pace at 4:31/km;
-          Open 800 Men, the largest individual field, sat at 5:04/km — narrowly faster than the
-          Spring race.
+          Open 800 Men, the largest individual field, sat at 5:04/km — narrowly faster than
+          Dublin Spring Race 3.
         </p>
 
         <RunTotalTable rows={RUN_TOTAL_ROWS} />
@@ -327,7 +327,7 @@ export default function DublinWinterRace2Report() {
         <p className="mb-6 text-sm text-slate-300">
           Median time on each of the eight workout stations. Pick a division below; bars are
           grouped by gender within each station, and the chart scales to that division. Watch the
-          Open formats for the same Lunges and Thrusters flip seen in Spring — women were faster
+          Open formats for the same Lunges and Thrusters flip seen in Dublin Spring Race 3 — women were faster
           than men in both Open 500 and Open 800. The Doubles Pro chart shows where the elite gap
           opens up: Burpees in 2:43 for Men, 3:11 for Women, both about half the time of any Open
           format.
@@ -369,7 +369,7 @@ export default function DublinWinterRace2Report() {
         <ul className="list-disc space-y-2 pl-5 text-sm text-slate-300">
           <li>
             The repeat-winner story isn't just Chloe Sawyer — Grace Fitzgerald and Ellie Carmody
-            won Doubles Pro Women here in 48:47 and went on to repeat in the Spring race.
+            won Doubles Pro Women here in 48:47 and went on to repeat at Dublin Spring Race 3.
           </li>
           <li>
             Burpees was the standout pain point. Doubles 500 Men medianed 3:54 and Open 500 Men
@@ -379,7 +379,7 @@ export default function DublinWinterRace2Report() {
           <li>
             Lunges and Thrusters flipped the gender order again in Open formats: women medianed
             faster than men on both stations in Open 500 and Open 800, the same pattern that held
-            in Spring. Sled Push too. Three stations where individual-format women consistently
+            at Dublin Spring Race 3. Sled Push too. Three stations where individual-format women consistently
             outpace individual-format men.
           </li>
           <li>

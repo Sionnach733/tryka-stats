@@ -1,7 +1,7 @@
 import StationPicker, { type StationsByDivision } from "@/app/components/StationPicker";
 
 export const intro =
-  "Dublin Summer Race 4 was the biggest Tryka event yet — 4,872 entries and roughly 8,143 athletes on the day, capping a season that has grown from 3,798 athletes at Autumn Race 1. Doubles ruled the entry list, women made up the majority of the field, and a single Doubles 500 pairing was the only crew to threaten 38 minutes.";
+  "Dublin Summer Race 4 was the biggest Tryka event yet — 4,872 entries and roughly 8,143 athletes on the day, capping a season that has grown from 3,798 athletes at Dublin Autumn Race 1. Doubles ruled the entry list, women made up the majority of the field, and a single Doubles 500 pairing was the only crew to threaten 38 minutes.";
 
 // ---- Overview ----
 const ENTRIES_PER_DIVISION: { label: string; value: number }[] = [
@@ -239,7 +239,7 @@ export default function DublinSummerRace4Report() {
           <li>
             The largest Tryka field on record: <span className="tabular-nums">4,872</span> entries and
             roughly <span className="tabular-nums">8,143</span> athletes — up from{" "}
-            <span className="tabular-nums">3,798</span> at Autumn Race 1 four races ago.
+            <span className="tabular-nums">3,798</span> at Dublin Autumn Race 1 three races earlier.
           </li>
           <li>
             Women were the majority of the field —{" "}
@@ -498,8 +498,8 @@ export default function DublinSummerRace4Report() {
         </h2>
         <ul className="list-disc space-y-2 pl-5 text-sm text-slate-300">
           <li>
-            Tryka&apos;s growth is relentless — the fourth Dublin race drew more than twice the athletes
-            of the first, and Doubles is the engine, supplying nearly two-thirds of every start slot.
+            Tryka&apos;s growth is relentless — Dublin Summer Race 4 drew more than twice the athletes
+            of Dublin Autumn Race 1, and Doubles is the engine, supplying nearly two-thirds of every start slot.
           </li>
           <li>
             The Pro divisions aren&apos;t winning on the stations — their edge is running. A flat{" "}
