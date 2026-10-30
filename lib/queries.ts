@@ -122,7 +122,7 @@ let recordEligibleDivisionsStmt:
   | null = null;
 let allRacesStmt: Database.Statement<[], RaceSummary> | null = null;
 let divisionRecordsStmt:
-  | Database.Statement<[string], DivisionRecord>
+  | Database.Statement<[string, string], DivisionRecord>
   | null = null;
 
 function getSearchStmt() {
@@ -403,7 +403,7 @@ export function getAllRaces(): RaceSummary[] {
 
 function getDivisionRecordsStmt() {
   if (!divisionRecordsStmt) {
-    divisionRecordsStmt = getDb().prepare<[string], DivisionRecord>(`
+    divisionRecordsStmt = getDb().prepare<[string, string], DivisionRecord>(`
       WITH ranked AS (
         SELECT r.id, r.members, r.gender, r.age_group, r.overall_time,
                e.race_name, e.division,
@@ -417,6 +417,7 @@ function getDivisionRecordsStmt() {
           AND r.overall_time IS NOT NULL
           AND r.disqual_reason IS NULL
           AND r.age_group IS NOT NULL
+          AND r.overall_time >= ?
       )
       SELECT id, members, gender, age_group, overall_time, race_name, division
       FROM ranked
@@ -426,8 +427,20 @@ function getDivisionRecordsStmt() {
   return divisionRecordsStmt;
 }
 
+// Safety net against bad source data (e.g. placeholder teams with dummy
+// 00:10:31 finishes) becoming a record. No adult result is near this; junior
+// divisions are exempt as kids' courses legitimately finish faster.
+const MIN_RECORD_TIME = "00:25:00";
+
+function minRecordTime(division: string): string {
+  return division.startsWith("TRYKA JNR") ? "00:00:00" : MIN_RECORD_TIME;
+}
+
 export function getDivisionRecords(division: string): DivisionRecord[] {
-  return getDivisionRecordsStmt().all(JSON.stringify(divisionDbNames(division)));
+  return getDivisionRecordsStmt().all(
+    JSON.stringify(divisionDbNames(division)),
+    minRecordTime(division),
+  );
 }
 
 export function getRefinedSplitsForResults(
