@@ -19,7 +19,7 @@ describe("getDivisionRecords", () => {
     const records = getDivisionRecords("TRYKA PRO");
     const db = getDb();
     const minStmt = db.prepare<
-      [string, string, string],
+      [string, string, string | null],
       { best: string | null }
     >(`
       SELECT MIN(r.overall_time) AS best
