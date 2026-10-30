@@ -61,8 +61,9 @@ describe("searchAthletes", () => {
   });
 
   it("includes totals that are at least as large as the rank", () => {
+    // Not a relay result: relay ranks span all genders, so they can exceed the gender count
     const hits = searchAthletes("Luttrell");
-    const hit = hits.find((h) => h.id === 20953);
+    const hit = hits.find((h) => h.id === 30080);
     expect(hit).toBeDefined();
     expect(hit!.total_gender).toEqual(expect.any(Number));
     expect(hit!.total_age_group).toEqual(expect.any(Number));
@@ -88,6 +89,18 @@ describe("searchAthletes", () => {
     });
     // There should be at least one team result with Breen
     expect(teamHit).toBeDefined();
+  });
+
+  it("reports the same totals as getResult", () => {
+    // Sole athlete in her age group — gender total must not collapse to the age group
+    const hit = searchAthletes("Breeda Ohora").find((h) =>
+      h.race_name.includes("LISBON"),
+    );
+    expect(hit).toBeDefined();
+    const detail = getResult(hit!.id)!;
+    expect(hit!.total_gender).toBe(detail.total_gender);
+    expect(hit!.total_age_group).toBe(detail.total_age_group);
+    expect(hit!.total_gender).toBeGreaterThan(hit!.total_age_group!);
   });
 });
 
