@@ -43,6 +43,17 @@ describe("getDivisionRecords", () => {
     }
   });
 
+  it("ignores implausibly fast finishes in adult divisions", () => {
+    for (const r of getDivisionRecords("TRYKA RELAY")) {
+      expect(r.overall_time >= "00:25:00").toBe(true);
+    }
+  });
+
+  it("does not apply the minimum time to junior divisions", () => {
+    const records = getDivisionRecords("TRYKA JNR 8-9");
+    expect(records.some((r) => r.overall_time < "00:25:00")).toBe(true);
+  });
+
   it("returns empty array for an unknown division", () => {
     expect(getDivisionRecords("NOT A REAL DIVISION")).toEqual([]);
   });
