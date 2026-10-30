@@ -16,8 +16,9 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            set -e
             cd ~/tryka-stats
             git pull
-            npm install
+            npm ci
             npm run build
             pm2 restart tryka-stats
