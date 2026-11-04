@@ -4,6 +4,7 @@ import {
   getDistinctDivisions,
   getDivisionRecords,
   getRecordEligibleDivisions,
+  isRetiredAgeGroup,
 } from "@/lib/queries";
 import { getDb } from "@/lib/db";
 
@@ -133,5 +134,39 @@ describe("division alias folding", () => {
       )
       .all();
     expect(records.length).toBe(combos.length);
+  });
+});
+
+describe("retired doubles age groups", () => {
+  it("retires the Series 1 10-year groups in every doubles division", () => {
+    for (const division of [
+      "TRYKA DOUBLES 500",
+      "TRYKA DOUBLES 800",
+      "TRYKA PRO DOUBLES",
+      "TRYKA DOUBLES PRO",
+    ]) {
+      expect(isRetiredAgeGroup(division, "30 - 39")).toBe(true);
+      expect(isRetiredAgeGroup(division, "16-19")).toBe(true);
+      expect(isRetiredAgeGroup(division, "30 - 34")).toBe(false);
+      expect(isRetiredAgeGroup(division, "16 - 24")).toBe(false);
+    }
+  });
+
+  it("leaves non-doubles divisions alone", () => {
+    expect(isRetiredAgeGroup("TRYKA PRO", "30 - 39")).toBe(false);
+    expect(isRetiredAgeGroup("TRYKA RELAY", "40 - 49")).toBe(false);
+    expect(isRetiredAgeGroup("TRYKA DOUBLES 500", null)).toBe(false);
+  });
+
+  it("current doubles records come only from the new 5-year groups", () => {
+    const records = getDivisionRecords("TRYKA DOUBLES 500");
+    const current = records.filter(
+      (r) => !isRetiredAgeGroup("TRYKA DOUBLES 500", r.age_group),
+    );
+    const retired = records.filter((r) =>
+      isRetiredAgeGroup("TRYKA DOUBLES 500", r.age_group),
+    );
+    expect(current.map((r) => r.age_group)).toContain("30 - 34");
+    expect(retired.map((r) => r.age_group)).toContain("30 - 39");
   });
 });

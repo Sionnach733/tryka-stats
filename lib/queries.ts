@@ -57,7 +57,7 @@ export type StationFieldRow = {
 
 export type ResultIdRow = { id: number };
 
-export type RaceSummary = { race_name: string };
+export type RaceSummary = { race_name: string; series: number | null };
 
 export type FinishTimeRow = { id: number; overall_time: string | null };
 
@@ -374,7 +374,7 @@ export function getRecordEligibleDivisions(): string[] {
 function getAllRacesStmtFn() {
   if (!allRacesStmt) {
     allRacesStmt = getDb().prepare<[], RaceSummary>(`
-      SELECT DISTINCT race_name
+      SELECT DISTINCT race_name, series
       FROM events
       WHERE division NOT LIKE 'TRYKA JNR%'
         AND division != 'TRYKA CLAN FITNESS'
@@ -384,8 +384,8 @@ function getAllRacesStmtFn() {
   return allRacesStmt;
 }
 
-// Race names end in their series number ("DUBLIN WINTER RACE 2", "LONDON RACE 5"),
-// so order by that number rather than alphabetically.
+// Race names end in their number within the series ("DUBLIN WINTER RACE 2",
+// "DUBLIN SERIES 2 RACE 1"), so order by series, then that number.
 function raceNumber(name: string): number {
   const m = name.match(/(\d+)\s*$/);
   return m ? Number(m[1]) : Number.MAX_SAFE_INTEGER;
@@ -396,6 +396,7 @@ export function getAllRaces(): RaceSummary[] {
     .all()
     .sort(
       (a, b) =>
+        (a.series ?? 0) - (b.series ?? 0) ||
         raceNumber(a.race_name) - raceNumber(b.race_name) ||
         a.race_name.localeCompare(b.race_name),
     );
@@ -434,6 +435,29 @@ const MIN_RECORD_TIME = "00:25:00";
 
 function minRecordTime(division: string): string {
   return division.startsWith("TRYKA JNR") ? "00:00:00" : MIN_RECORD_TIME;
+}
+
+// Doubles divisions used 10-year age groups in Series 1 and switched to the
+// singles' 5-year groups in Series 2. Old teams can't be placed in the new
+// groups, so their records are kept apart as retired.
+const RETIRED_DOUBLES_AGE_GROUPS = new Set([
+  "16-19",
+  "20 - 29",
+  "30 - 39",
+  "40 - 49",
+  "50 - 59",
+  "60 - 69",
+]);
+
+export function isRetiredAgeGroup(
+  division: string,
+  ageGroup: string | null,
+): boolean {
+  return (
+    canonicalDivision(division).includes("DOUBLES") &&
+    ageGroup !== null &&
+    RETIRED_DOUBLES_AGE_GROUPS.has(ageGroup)
+  );
 }
 
 export function getDivisionRecords(division: string): DivisionRecord[] {

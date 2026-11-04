@@ -6,6 +6,7 @@ import {
   getRawSplits,
   getStationFieldTimes,
   getRunFieldTimes,
+  getAllRaces,
 } from "@/lib/queries";
 import { parseTime } from "@/lib/format";
 
@@ -295,5 +296,15 @@ describe("station percentile consistency (result 30808 Burpees)", () => {
     // but it should be very close (within 1 rank of total)
     expect(rank).toBeLessThanOrEqual(burpeesTimes.length);
     expect(rank).toBeGreaterThan(burpeesTimes.length * 0.99);
+  });
+});
+
+describe("getAllRaces", () => {
+  it("orders races by series, then race number", () => {
+    const names = getAllRaces().map((r) => r.race_name);
+    expect(names.indexOf("LISBON RACE 6 GRAND FINALE")).toBeLessThan(
+      names.indexOf("DUBLIN SERIES 2 RACE 1"),
+    );
+    expect(names.at(-1)).toBe("DUBLIN SERIES 2 RACE 1");
   });
 });

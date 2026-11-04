@@ -4,6 +4,8 @@ import {
   canonicalDivision,
   getDivisionRecords,
   getRecordEligibleDivisions,
+  isRetiredAgeGroup,
+  type DivisionRecord,
 } from "@/lib/queries";
 import { displayGender, displayMembers, parseMembers } from "@/lib/format";
 import DivisionSelect from "@/app/components/DivisionSelect";
@@ -23,6 +25,44 @@ function ageGroupSortKey(ag: string | null): [number, string] {
   if (!ag) return [Number.POSITIVE_INFINITY, ""];
   const m = ag.match(/(\d+)/);
   return [m ? Number(m[1]) : Number.POSITIVE_INFINITY, ag];
+}
+
+function RecordsTable({ records }: { records: DivisionRecord[] }) {
+  return (
+    <div className="overflow-x-auto rounded-lg border border-tryka-navy-light">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="bg-tryka-navy-light text-left text-xs uppercase tracking-wide text-slate-400">
+            <th className="px-3 py-2">Athlete</th>
+            <th className="px-3 py-2">Race</th>
+            <th className="px-3 py-2">Gender</th>
+            <th className="px-3 py-2">Age Group</th>
+            <th className="px-3 py-2 text-right">Time</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-tryka-navy-light">
+          {records.map((r) => (
+            <tr key={r.id} className="hover:bg-tryka-navy-light/50">
+              <td className="px-3 py-2 font-medium">
+                <Link
+                  href={`/results/${r.id}`}
+                  className="text-tryka-green hover:underline"
+                >
+                  {displayMembers(parseMembers(r.members))}
+                </Link>
+              </td>
+              <td className="px-3 py-2">{r.race_name}</td>
+              <td className="px-3 py-2">{displayGender(r.gender)}</td>
+              <td className="px-3 py-2">{r.age_group ?? "—"}</td>
+              <td className="px-3 py-2 text-right tabular-nums">
+                {r.overall_time}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
 export default async function HallOfFamePage({
@@ -45,6 +85,8 @@ export default async function HallOfFamePage({
     const [bn, bs] = ageGroupSortKey(b.age_group);
     return an - bn || as.localeCompare(bs);
   });
+  const current = records.filter((r) => !isRetiredAgeGroup(selected, r.age_group));
+  const retired = records.filter((r) => isRetiredAgeGroup(selected, r.age_group));
 
   return (
     <div>
@@ -62,45 +104,26 @@ export default async function HallOfFamePage({
         <DivisionSelect divisions={divisions} selected={selected} />
       </div>
 
-      {records.length === 0 ? (
+      {current.length === 0 ? (
         <p className="text-sm text-slate-400">
           No records yet for this division.
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-tryka-navy-light">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-tryka-navy-light text-left text-xs uppercase tracking-wide text-slate-400">
-                <th className="px-3 py-2">Athlete</th>
-                <th className="px-3 py-2">Race</th>
-                <th className="px-3 py-2">Gender</th>
-                <th className="px-3 py-2">Age Group</th>
-                <th className="px-3 py-2 text-right">Time</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-tryka-navy-light">
-              {records.map((r) => (
-                <tr key={r.id} className="hover:bg-tryka-navy-light/50">
-                  <td className="px-3 py-2 font-medium">
-                    <Link
-                      href={`/results/${r.id}`}
-                      className="text-tryka-green hover:underline"
-                    >
-                      {displayMembers(parseMembers(r.members))}
-                    </Link>
-                  </td>
-                  <td className="px-3 py-2">{r.race_name}</td>
-                  <td className="px-3 py-2">{displayGender(r.gender)}</td>
-                  <td className="px-3 py-2">{r.age_group ?? "—"}</td>
-                  <td className="px-3 py-2 text-right tabular-nums">
-                    {r.overall_time}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <RecordsTable records={current} />
       )}
+
+      {retired.length > 0 ? (
+        <section className="mt-12">
+          <h2 className="text-lg font-semibold">Series 1 age groups</h2>
+          <p className="mt-1 text-sm text-slate-400">
+            Doubles used 10-year age groups in Series 1. These records stand
+            but can no longer be beaten.
+          </p>
+          <div className="mt-4">
+            <RecordsTable records={retired} />
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }
