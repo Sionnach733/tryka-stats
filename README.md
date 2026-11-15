@@ -34,4 +34,21 @@ Open [http://localhost:3000](http://localhost:3000) and search by athlete name (
 ```bash
 npm test              # single run
 npm run test:watch    # watch mode
+npm run typecheck     # tsc --noEmit
+npm run build && npm run test:e2e   # Playwright e2e against a production build
 ```
+
+### Fixture database (CI)
+
+CI doesn't have the full `tryka.db`. It uses `fixtures/tryka-fixture.db.gz`, a subset of real events with the original ids (see `FIXTURE_EVENT_IDS` in `scripts/build-fixture-db.mjs`). To run locally against the fixture:
+
+```bash
+gunzip -kf fixtures/tryka-fixture.db.gz
+TRYKA_DB_PATH=$PWD/fixtures/tryka-fixture.db npm test
+```
+
+Run `npm run fixture:db` to regenerate it after the schema changes or when a test needs data that isn't in the fixture.
+
+## Contributing
+
+`main` is protected: open a PR, and the `CI` check (typecheck, vitest, build, Playwright e2e) must pass before merge. Deploys run automatically once CI passes on `main`.

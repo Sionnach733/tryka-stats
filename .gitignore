@@ -9,3 +9,11 @@ next-env.d.ts
 .npm-cache/
 .idea/
 .claude/
+
+# Playwright
+/playwright-report/
+/test-results/
+/blob-report/
+
+# Uncompressed fixture DB (the .gz is committed)
+/fixtures/tryka-fixture.db
