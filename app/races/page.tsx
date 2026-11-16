@@ -36,7 +36,7 @@ export default async function RaceReportsPage() {
           Race Reports
         </h1>
         <p className="mt-2 text-sm text-slate-300">
-          In-depth reports from Tryka race events.
+          In-depth reports from Tryka races.
         </p>
       </header>
 
