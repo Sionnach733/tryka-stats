@@ -14,9 +14,18 @@ npm run dev                    # start dev server (http://localhost:3000)
 npm test                       # run all tests (vitest)
 npm run test:watch             # tests in watch mode
 npx vitest __tests__/format.test.ts  # run a single test file
+npm run typecheck              # tsc --noEmit
+npm run build && npm run test:e2e   # Playwright e2e (e2e/*.spec.ts) against `next start`
+npm run fixture:db             # regenerate fixtures/tryka-fixture.db(.gz) from the full DB
 ```
 
 Tests require `tryka.db` to be accessible at the default path (`../tryka-scraper/tryka.db`) or via `TRYKA_DB_PATH`.
+
+## CI & workflow
+
+- `main` is protected by a ruleset: no direct pushes. Every change goes through a PR, and the `ci` check must pass. **Always branch and open a PR; never push to main.**
+- `.github/workflows/ci.yml` runs typecheck, vitest, `next build` and Playwright against `fixtures/tryka-fixture.db.gz`, a committed subset of real events with original ids. `deploy.yml` runs only after CI succeeds on `main`.
+- If a new test depends on specific data (result ids, names, divisions), add the event id to `FIXTURE_EVENT_IDS` in `scripts/build-fixture-db.mjs`, run `npm run fixture:db` and commit the new `.gz`. Regenerate it after schema changes too.
 
 ## Architecture
 
@@ -66,7 +75,7 @@ The app opens `tryka.db` **read-only** — it never writes. Schema owned by `try
 
 ## Testing
 
-Tests live in `__tests__/` and use Vitest. Six test files:
+Unit/integration tests live in `__tests__/` and use Vitest. E2E smoke tests live in `e2e/` and use Playwright (`playwright.config.ts` starts `next start`). Vitest files include:
 
 - `format.test.ts` — unit tests for pure formatting helpers
 - `queries.test.ts` — integration tests against real `tryka.db`
