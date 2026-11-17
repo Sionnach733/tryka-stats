@@ -3,6 +3,10 @@ const nextConfig = {
   // better-sqlite3 is a native module — keep it external in the server bundle.
   serverExternalPackages: ["better-sqlite3"],
 
+  experimental: {
+    agentUpgrade: "security",
+  },
+
   async headers() {
     return [
       {
