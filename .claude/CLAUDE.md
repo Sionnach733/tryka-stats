@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-`tryka-stats` is a Next.js webapp that lets athletes search and analyse their results from Tryka races. It reads the SQLite database produced by the sibling [`tryka-scraper`](../tryka-scraper) project.
+`tryka-stats` is a Next.js webapp that lets athletes search and analyse their results from Tryka races. It reads the SQLite database produced by the sibling [`tryka-scraper`](../tryka-scraper) project. Athletes can log in (email magic link) and claim their results into a profile; that user data lives in a separate writable `app.db`.
 
 ## Commands
 
@@ -31,14 +31,19 @@ Tests require `tryka.db` to be accessible at the default path (`../tryka-scraper
 
 ### Pages (server components)
 
-- **`app/page.tsx`** — home page; reads `searchParams.q`, runs search, renders `SearchBar` + `ResultsTable`
+- **`app/page.tsx`** — home page; reads `searchParams.q`, runs athlete search, renders `SearchBar` + `AthleteResultsTable` (one row per athlete)
+- **`app/athletes/[slug]/page.tsx`** — public athlete profile (all results, best times); owner sees a Manage section (untick results, add misspelled ones, release names). Mutations are server actions in `app/athletes/actions.ts`
+- **`app/login/page.tsx`** — email magic-link sign-in form
 - **`app/results/[id]/page.tsx`** — detail page (~380 lines); fetches result data, computes KDE distributions, percentiles, and summary tiles server-side; renders three tabs (Workout Result, Splits, Stations)
-- **`app/api/search/route.ts`** — GET endpoint for client-side debounced search
+- **`app/api/search/route.ts`** — GET athlete search (grouped hits) for `SearchBar`
+- **`app/api/results-search/route.ts`** — GET per-result search (Compare, manual result claiming)
+- **`app/api/auth/{request,verify,logout}`**, **`app/api/me`** — magic-link auth; `/api/me` lets client components (`AuthNav`) show login state without making cached pages dynamic
 
 ### Client components (`app/components/`)
 
 - **`SearchBar.tsx`** — debounced input (250ms) with abort controller; calls `/api/search`; updates URL via `router.replace()`
-- **`ResultsTable.tsx`** — paginated search hits table; preserves search query in detail page links
+- **`AthleteResultsTable.tsx`** — athlete search hits table; preserves search query in profile links
+- **`AuthNav.tsx`**, **`ClaimButton.tsx`**, **`ManageResults.tsx`**, **`AddResultSearch.tsx`** — login state and claiming UI
 - **`ResultTabs.tsx`** — tab switcher synced to URL search params
 - **`StationCard.tsx`** — station data tile with interactive SVG KDE plot (hover/touch tooltips)
 - **`StationsGrid.tsx`** — responsive grid layout for station cards
@@ -46,7 +51,11 @@ Tests require `tryka.db` to be accessible at the default path (`../tryka-scraper
 ### Data layer (`lib/`)
 
 - **`db.ts`** — singleton read-only `better-sqlite3` connection; registers custom `normalize_search()` SQL function for diacritical-insensitive, apostrophe-normalised matching; global caching for dev hot reload
-- **`queries.ts`** — 5 prepared statements: `searchAthletes`, `getResult`, `getRefinedSplits`, `getRawSplits`, `getStationFieldTimes`
+- **`queries.ts`** — prepared statements: `searchResults`, `getResult`, `getResultsByIds`, `getRefinedSplits`, `getRawSplits`, `getStationFieldTimes`, …
+- **`athletes.ts`** — athlete identity: groups result-members by `athleteKey(name)` (normalised, country suffix like `(IRL)` stripped) into an in-memory index rebuilt when `PRAGMA data_version` changes; `searchAthletes`
+- **`appDb.ts`** — writable `app.db` (`APP_DB_PATH`, default `./data/app.db`): users, login_tokens, sessions, athlete_claims, result_claims, result_exclusions
+- **`claims.ts`** — claim rules: one owner per name group and per (result_id, member_index); owners untick (exclude) results, add others manually; `syncUser` auto-attaches new results
+- **`auth.ts`** — magic-link tokens and sessions (only SHA-256 hashes stored), `getCurrentUser()`
 - **`format.ts`** — pure helpers: `parseMembers`, `displayMembers`, `displayGender`, `displayPace`, `parseTime`, `formatMmSs`, `computeKde`
 
 ## Sibling Project: tryka-scraper
@@ -58,7 +67,7 @@ The database is produced by [`tryka-scraper`](../tryka-scraper), a Python scrape
 
 ## Database
 
-The app opens `tryka.db` **read-only** — it never writes. Schema owned by `tryka-scraper` (see `../tryka-scraper/schema.sql`). Key tables:
+The app opens `tryka.db` **read-only** — it never writes. User data (accounts, claims) goes in the separate `app.db` (see `lib/appDb.ts`); in production set `APP_DB_PATH` outside the repo and back it up. `result_id`s in `app.db` refer to `tryka.db` `results.id`. Schema owned by `tryka-scraper` (see `../tryka-scraper/schema.sql`). Key tables:
 
 - `events` — race name, division
 - `results` — per-athlete/team row; `members` is a JSON array of name strings

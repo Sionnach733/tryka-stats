@@ -2,18 +2,18 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import type { SearchHit } from "@/lib/queries";
-import ResultsTable from "./ResultsTable";
+import type { AthleteHit } from "@/lib/athletes";
+import AthleteResultsTable from "./AthleteResultsTable";
 
 export default function SearchBar({
   initialQuery = "",
   initialHits = [],
 }: {
   initialQuery?: string;
-  initialHits?: SearchHit[];
+  initialHits?: AthleteHit[];
 }) {
   const [value, setValue] = useState(initialQuery);
-  const [hits, setHits] = useState<SearchHit[]>(initialHits);
+  const [hits, setHits] = useState<AthleteHit[]>(initialHits);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(!!initialQuery);
   const abortRef = useRef<AbortController | null>(null);
@@ -40,7 +40,7 @@ export default function SearchBar({
           { signal: controller.signal },
         );
         if (res.ok) {
-          const data: SearchHit[] = await res.json();
+          const data: AthleteHit[] = await res.json();
           setHits(data);
           setHasSearched(true);
         }
@@ -83,7 +83,7 @@ export default function SearchBar({
         </p>
       )}
 
-      {hasSearched && !loading && <ResultsTable hits={hits} query={value.trim()} />}
+      {hasSearched && !loading && <AthleteResultsTable hits={hits} query={value.trim()} />}
     </div>
   );
 }

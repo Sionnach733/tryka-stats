@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import AuthNav from "./AuthNav";
 
 const LINKS = [
   { href: "/", label: "Home" },
@@ -47,6 +48,9 @@ export default function Navbar() {
               </li>
             );
           })}
+          <li>
+            <AuthNav />
+          </li>
         </ul>
       </nav>
     </header>

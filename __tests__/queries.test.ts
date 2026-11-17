@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
-  searchAthletes,
+  searchResults,
   getResult,
   getRefinedSplits,
   getRawSplits,
@@ -10,9 +10,9 @@ import {
 } from "@/lib/queries";
 import { parseTime } from "@/lib/format";
 
-describe("searchAthletes", () => {
+describe("searchResults", () => {
   it("returns results for a known surname", () => {
-    const hits = searchAthletes("Breen");
+    const hits = searchResults("Breen");
     expect(hits.length).toBeGreaterThan(0);
     expect(hits[0]).toMatchObject({
       id: expect.any(Number),
@@ -23,47 +23,47 @@ describe("searchAthletes", () => {
   });
 
   it("is case-insensitive", () => {
-    const lower = searchAthletes("breen");
-    const upper = searchAthletes("BREEN");
+    const lower = searchResults("breen");
+    const upper = searchResults("BREEN");
     expect(lower.length).toBe(upper.length);
     expect(lower.length).toBeGreaterThan(0);
   });
 
   it("returns empty array for empty query", () => {
-    expect(searchAthletes("")).toEqual([]);
+    expect(searchResults("")).toEqual([]);
   });
 
   it("returns empty array for whitespace-only query", () => {
-    expect(searchAthletes("   ")).toEqual([]);
+    expect(searchResults("   ")).toEqual([]);
   });
 
   it("matches names with diacritics when searching without them", () => {
-    const hits = searchAthletes("Ciaran");
+    const hits = searchResults("Ciaran");
     const match = hits.find((h) => h.members.includes("Ciarán"));
     expect(match).toBeDefined();
   });
 
   it("matches names with diacritics when searching with them", () => {
-    const hits = searchAthletes("Ciarán");
+    const hits = searchResults("Ciarán");
     const match = hits.find((h) => h.members.includes("Ciarán"));
     expect(match).toBeDefined();
   });
 
   it("matches names with apostrophes when searching with a space instead", () => {
-    const hits = searchAthletes("O Shea");
+    const hits = searchResults("O Shea");
     const match = hits.find((h) => h.members.includes("O'Shea"));
     expect(match).toBeDefined();
   });
 
   it("matches names with apostrophes when searching with the apostrophe", () => {
-    const hits = searchAthletes("O'Shea");
+    const hits = searchResults("O'Shea");
     const match = hits.find((h) => h.members.includes("O'Shea"));
     expect(match).toBeDefined();
   });
 
   it("includes totals that are at least as large as the rank", () => {
     // Not a relay result: relay ranks span all genders, so they can exceed the gender count
-    const hits = searchAthletes("Luttrell");
+    const hits = searchResults("Luttrell");
     const hit = hits.find((h) => h.id === 30080);
     expect(hit).toBeDefined();
     expect(hit!.total_gender).toEqual(expect.any(Number));
@@ -73,17 +73,17 @@ describe("searchAthletes", () => {
   });
 
   it("returns empty array for a name that doesn't exist", () => {
-    expect(searchAthletes("ZZZZNONEXISTENT")).toEqual([]);
+    expect(searchResults("ZZZZNONEXISTENT")).toEqual([]);
   });
 
   it("respects the 200-row limit", () => {
-    const hits = searchAthletes("a");
+    const hits = searchResults("a");
     expect(hits.length).toBeLessThanOrEqual(200);
   });
 
   it("matches team members", () => {
     // Search for a name that appears in a doubles/team event
-    const hits = searchAthletes("Breen");
+    const hits = searchResults("Breen");
     const teamHit = hits.find((h) => {
       const members = JSON.parse(h.members);
       return Array.isArray(members) && members.length > 1;
@@ -94,7 +94,7 @@ describe("searchAthletes", () => {
 
   it("reports the same totals as getResult", () => {
     // Sole athlete in her age group — gender total must not collapse to the age group
-    const hit = searchAthletes("Breeda Ohora").find((h) =>
+    const hit = searchResults("Breeda Ohora").find((h) =>
       h.race_name.includes("LISBON"),
     );
     expect(hit).toBeDefined();

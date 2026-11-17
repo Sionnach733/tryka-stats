@@ -12,7 +12,7 @@ function open(): Database.Database {
   return new Database(path, { readonly: true, fileMustExist: true });
 }
 
-function normalizeSearch(s: string): string {
+export function normalizeSearch(s: string): string {
   return s
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "") // strip diacritics

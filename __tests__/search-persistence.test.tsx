@@ -3,8 +3,8 @@
  */
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
-import ResultsTable from "@/app/components/ResultsTable";
-import type { SearchHit } from "@/lib/queries";
+import AthleteResultsTable from "@/app/components/AthleteResultsTable";
+import type { AthleteHit } from "@/lib/athletes";
 
 afterEach(cleanup);
 
@@ -24,42 +24,43 @@ vi.mock("next/link", () => ({
   ),
 }));
 
-const hit: SearchHit = {
-  id: 42,
-  race_name: "Test Race",
-  division: "Elite",
-  members: '["Jane Doe"]',
-  gender: "W",
-  overall_time: "01:23:45",
-  rank_overall: 1,
-  total_gender: 10,
-  age_group: "30-34",
-  rank_age_group: 1,
-  total_age_group: 5,
+const hit: AthleteHit = {
+  slug: "jane-doe",
+  name: "Jane Doe",
+  resultCount: 3,
+  races: ["Test Race", "Other Race"],
+  divisions: ["Elite"],
+  latestRace: "Test Race",
+  claimed: false,
 };
 
-describe("ResultsTable query persistence", () => {
-  it("includes ?q= param in result links when query is provided", () => {
-    render(<ResultsTable hits={[hit]} query="jane" />);
+describe("AthleteResultsTable query persistence", () => {
+  it("includes ?q= param in profile links when query is provided", () => {
+    render(<AthleteResultsTable hits={[hit]} query="jane" />);
     const link = screen.getByRole("link", { name: "Jane Doe" });
-    expect(link.getAttribute("href")).toBe("/results/42?q=jane");
+    expect(link.getAttribute("href")).toBe("/athletes/jane-doe?q=jane");
   });
 
   it("does not include ?q= param when query is empty", () => {
-    render(<ResultsTable hits={[hit]} query="" />);
+    render(<AthleteResultsTable hits={[hit]} query="" />);
     const link = screen.getByRole("link", { name: "Jane Doe" });
-    expect(link.getAttribute("href")).toBe("/results/42");
+    expect(link.getAttribute("href")).toBe("/athletes/jane-doe");
   });
 
   it("does not include ?q= param when query is omitted", () => {
-    render(<ResultsTable hits={[hit]} />);
+    render(<AthleteResultsTable hits={[hit]} />);
     const link = screen.getByRole("link", { name: "Jane Doe" });
-    expect(link.getAttribute("href")).toBe("/results/42");
+    expect(link.getAttribute("href")).toBe("/athletes/jane-doe");
   });
 
   it("encodes special characters in query param", () => {
-    render(<ResultsTable hits={[hit]} query="o'brien" />);
+    render(<AthleteResultsTable hits={[hit]} query="o'brien" />);
     const link = screen.getByRole("link", { name: "Jane Doe" });
-    expect(link.getAttribute("href")).toBe("/results/42?q=o'brien");
+    expect(link.getAttribute("href")).toBe("/athletes/jane-doe?q=o'brien");
+  });
+
+  it("shows a claimed badge", () => {
+    render(<AthleteResultsTable hits={[{ ...hit, claimed: true }]} />);
+    expect(screen.getByText("Claimed")).toBeTruthy();
   });
 });
