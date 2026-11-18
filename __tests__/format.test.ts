@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseMembers, displayMembers, displayGender, parseTime, formatMmSs, formatPace } from "@/lib/format";
+import { parseMembers, displayMembers, displayGender, parseTime, formatMmSs, formatPace, countPodiums } from "@/lib/format";
 
 describe("parseMembers", () => {
   it("parses a solo athlete", () => {
@@ -77,4 +77,30 @@ describe("formatPace", () => {
   it("calculates pace for 6.4km", () => expect(formatPace(942, 6.4)).toBe("2:27 /km"));
   it("calculates pace for 4km", () => expect(formatPace(942, 4)).toBe("3:56 /km"));
   it("rounds up correctly when seconds would be 60", () => expect(formatPace(299.7, 1)).toBe("5:00 /km"));
+});
+
+describe("countPodiums", () => {
+  it("counts age group ranks 1 to 3", () => {
+    expect(
+      countPodiums([
+        { rank_age_group: 1 },
+        { rank_age_group: 2 },
+        { rank_age_group: 3 },
+        { rank_age_group: 4 },
+      ]),
+    ).toBe(3);
+  });
+
+  it("ignores missing age group ranks", () => {
+    expect(countPodiums([{ rank_age_group: null }, { rank_age_group: 2 }])).toBe(1);
+  });
+
+  it("uses age group rank, not overall rank", () => {
+    expect(countPodiums([{ rank_age_group: 10, rank_overall: 1 } as never])).toBe(0);
+    expect(countPodiums([{ rank_age_group: 1, rank_overall: 50 } as never])).toBe(1);
+  });
+
+  it("returns 0 for no results", () => {
+    expect(countPodiums([])).toBe(0);
+  });
 });
