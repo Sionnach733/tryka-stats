@@ -5,7 +5,7 @@ import { getAthleteByKey, getAthleteBySlug, getResultMeta, stripCountry } from "
 import { getCurrentUser } from "@/lib/auth";
 import { getGroupEntries, getProfile, profileKeyForEntry, userKeys } from "@/lib/claims";
 import { getResultsByIds, type SearchHit } from "@/lib/queries";
-import { displayGender, formatMmSs, parseMembers, parseTime } from "@/lib/format";
+import { countPodiums, displayGender, formatMmSs, parseMembers, parseTime } from "@/lib/format";
 import ClaimButton from "@/app/components/ClaimButton";
 import ManageResults, { type ManageRow } from "@/app/components/ManageResults";
 import AddResultSearch from "@/app/components/AddResultSearch";
@@ -83,7 +83,7 @@ export default async function AthletePage({
     const prev = bestByDivision.get(hit.division);
     if (prev == null || t < prev) bestByDivision.set(hit.division, t);
   }
-  const podiums = rows.filter((r) => r.hit.rank_overall != null && r.hit.rank_overall <= 3).length;
+  const podiums = countPodiums(rows.map((r) => r.hit));
 
   let manageRows: ManageRow[] = [];
   let ownedGroups: { slug: string; name: string }[] = [];

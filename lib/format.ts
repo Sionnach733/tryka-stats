@@ -97,3 +97,8 @@ export function formatPace(totalSeconds: number, distanceKm: number): string {
   const s = paceSeconds % 60;
   return `${m}:${String(s).padStart(2, "0")} /km`;
 }
+
+/** Number of results where the athlete finished top 3 in their age group. */
+export function countPodiums(rows: { rank_age_group: number | null }[]): number {
+  return rows.filter((r) => r.rank_age_group != null && r.rank_age_group <= 3).length;
+}
