@@ -5,6 +5,7 @@ import {
   consumeLoginToken,
   createLoginToken,
   deleteSession,
+  appUrl,
   getUserBySessionToken,
   safeNext,
 } from "@/lib/auth";
@@ -65,5 +66,24 @@ describe("safeNext", () => {
     expect(safeNext("//evil.example")).toBe("/");
     expect(safeNext("/\\evil.example")).toBe("/");
     expect(safeNext(null)).toBe("/");
+  });
+});
+
+describe("appUrl", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.restoreAllMocks();
+  });
+
+  it("uses APP_URL and strips trailing slashes", () => {
+    vi.stubEnv("APP_URL", "https://trykastats.com//");
+    expect(appUrl()).toBe("https://trykastats.com");
+  });
+
+  it("falls back to localhost when unset", () => {
+    vi.stubEnv("APP_URL", "");
+    vi.stubEnv("NODE_ENV", "test");
+    delete process.env.APP_URL;
+    expect(appUrl()).toBe("http://localhost:3000");
   });
 });

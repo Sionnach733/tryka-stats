@@ -96,6 +96,14 @@ export function safeNext(next: string | null | undefined): string {
   return next;
 }
 
+let warnedMissingAppUrl = false;
+
+/** Public base URL for emailed links and redirects (never the proxy's internal origin). */
 export function appUrl(): string {
-  return (process.env.APP_URL ?? "http://localhost:3000").replace(/\/+$/, "");
+  const configured = process.env.APP_URL;
+  if (!configured && process.env.NODE_ENV === "production" && !warnedMissingAppUrl) {
+    warnedMissingAppUrl = true;
+    console.error("[auth] APP_URL is not set; sign-in links will point at http://localhost:3000");
+  }
+  return (configured ?? "http://localhost:3000").replace(/\/+$/, "");
 }
