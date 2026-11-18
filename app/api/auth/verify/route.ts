@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SESSION_COOKIE, SESSION_TTL_MS, consumeLoginToken, safeNext } from "@/lib/auth";
+import { SESSION_COOKIE, SESSION_TTL_MS, appUrl, consumeLoginToken, safeNext } from "@/lib/auth";
 
 export function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token") ?? "";
@@ -7,9 +7,9 @@ export function GET(req: NextRequest) {
   const session = token ? consumeLoginToken(token) : null;
 
   if (!session) {
-    return NextResponse.redirect(new URL("/login?error=expired", req.url));
+    return NextResponse.redirect(new URL("/login?error=expired", appUrl()));
   }
-  const res = NextResponse.redirect(new URL(next, req.url));
+  const res = NextResponse.redirect(new URL(next, appUrl()));
   res.cookies.set(SESSION_COOKIE, session.sessionToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
