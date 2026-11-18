@@ -242,7 +242,7 @@ export default async function AthletePage({
       </section>
 
       {isOwner && (
-        <section className="mt-12 space-y-8 rounded-lg border border-tryka-navy-light px-4 py-4">
+        <section id="manage" className="mt-12 scroll-mt-6 space-y-8 rounded-lg border border-tryka-navy-light px-4 py-4">
           <h2 className="text-lg font-semibold">Manage your profile</h2>
           <ManageResults rows={manageRows} groups={ownedGroups} />
           <AddResultSearch
