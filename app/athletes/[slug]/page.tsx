@@ -83,7 +83,7 @@ export default async function AthletePage({
     const prev = bestByDivision.get(hit.division);
     if (prev == null || t < prev) bestByDivision.set(hit.division, t);
   }
-  const podiums = rows.filter((r) => r.hit.rank_overall != null && r.hit.rank_overall <= 3).length;
+  const podiums = rows.filter((r) => r.hit.rank_age_group != null && r.hit.rank_age_group <= 3).length;
 
   let manageRows: ManageRow[] = [];
   let ownedGroups: { slug: string; name: string }[] = [];
