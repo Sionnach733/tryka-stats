@@ -1,6 +1,7 @@
 import Link from "next/link";
 import SearchBar from "./components/SearchBar";
-import { searchAthletes } from "@/lib/queries";
+import { searchAthletes } from "@/lib/athletes";
+import { claimedKeys } from "@/lib/claims";
 
 type SearchParams = Promise<{ q?: string }>;
 
@@ -11,7 +12,11 @@ export default async function HomePage({
 }) {
   const { q: rawQ } = await searchParams;
   const q = (rawQ ?? "").trim();
-  const hits = q.length >= 3 ? searchAthletes(q) : [];
+  let hits: ReturnType<typeof searchAthletes> = [];
+  if (q.length >= 3) {
+    const claimed = claimedKeys();
+    hits = searchAthletes(q, (k) => claimed.has(k));
+  }
 
   return (
     <div>
@@ -20,9 +25,9 @@ export default async function HomePage({
           Athlete Search
         </h1>
         <p className="mt-2 text-sm text-slate-300">
-          Search by name to find your Tryka results. Returns individual and team
-          entries from all races — including finish time, station splits, and
-          how you ranked in your division.
+          Search by name to find an athlete and see all their Tryka results in
+          one place — individual, doubles and relay — with finish times,
+          station splits, and how they ranked in their division.
         </p>
       </div>
 

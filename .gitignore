@@ -17,3 +17,6 @@ next-env.d.ts
 
 # Uncompressed fixture DB (the .gz is committed)
 /fixtures/tryka-fixture.db
+
+# App database (users, sessions, claims) — written by the app
+/data/

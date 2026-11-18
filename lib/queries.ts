@@ -262,7 +262,8 @@ function getRunFieldByAgeStmt() {
   return runFieldByAgeStmt;
 }
 
-export function searchAthletes(query: string): SearchHit[] {
+/** Per-result name search (used by Compare and manual result claiming). */
+export function searchResults(query: string): SearchHit[] {
   const q = query.trim();
   if (!q) return [];
   return getSearchStmt().all(q);
@@ -480,4 +481,28 @@ export function getRefinedSplitsForResults(
     ORDER BY split_order
   `);
   return stmt.all(...ids);
+}
+
+let resultsByIdsStmt: Database.Statement<[string], SearchHit> | null = null;
+
+/** Search-hit shaped rows for the given result ids (profile pages). */
+export function getResultsByIds(ids: number[]): SearchHit[] {
+  if (ids.length === 0) return [];
+  if (!resultsByIdsStmt) {
+    resultsByIdsStmt = getDb().prepare<[string], SearchHit>(`
+      SELECT r.id, r.members, r.age_group, r.gender, r.overall_time,
+             r.rank_overall, r.rank_age_group,
+             (SELECT COUNT(*) FROM results r2
+              WHERE r2.event_id = r.event_id AND r2.gender = r.gender) AS total_gender,
+             (SELECT COUNT(*) FROM results r2
+              WHERE r2.event_id = r.event_id AND r2.gender = r.gender
+                AND r2.age_group = r.age_group) AS total_age_group,
+             e.race_name, e.division
+      FROM results r
+      JOIN events e ON r.event_id = e.id
+      WHERE r.id IN (SELECT value FROM json_each(?))
+      ORDER BY e.series DESC, r.event_id DESC
+    `);
+  }
+  return resultsByIdsStmt.all(JSON.stringify(ids));
 }

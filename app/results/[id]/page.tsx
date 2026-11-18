@@ -17,6 +17,8 @@ import type { StationData } from "@/app/components/StationsGrid";
 import type { RunData } from "@/app/components/RunsGrid";
 import StationsTab from "@/app/components/StationsTab";
 import RunsTab from "@/app/components/RunsTab";
+import { getAthleteByKey, stripCountry } from "@/lib/athletes";
+import { profileKeyForEntry } from "@/lib/claims";
 import CompareButton from "@/app/components/CompareButton";
 import ComparisonTiles from "@/app/components/ComparisonTiles";
 import type { ComparisonTotals } from "@/app/components/ComparisonTiles";
@@ -67,6 +69,7 @@ export default async function ResultPage({ params, searchParams }: { params: Par
   const refined = getRefinedSplits(id);
   const raw = getRawSplits(id);
   const members = parseMembers(result.members);
+  const memberLinks = memberProfileLinks(id, members);
 
   const stationData = buildStationData(refined, result.event_id, result.gender);
   const runData = buildRunData(refined, result.event_id, result.gender);
@@ -148,7 +151,7 @@ export default async function ResultPage({ params, searchParams }: { params: Par
       </div>
 
       <div className={isCompareMode ? "grid grid-cols-1 gap-4 lg:grid-cols-2" : ""}>
-        <AthleteCard result={result} members={members} />
+        <AthleteCard result={result} members={members} links={memberLinks} />
         {isCompareMode && compareResult && (
           <AthleteCard result={compareResult} members={parseMembers(compareResult.members)} />
         )}
@@ -233,17 +236,41 @@ function Field({
   );
 }
 
+type MemberLink = { name: string; slug: string | null };
+
+function memberProfileLinks(resultId: number, members: string[]): MemberLink[] {
+  return members.map((name, memberIndex) => {
+    const key = profileKeyForEntry({ resultId, memberIndex });
+    return { name, slug: key ? (getAthleteByKey(key)?.slug ?? null) : null };
+  });
+}
+
 function AthleteCard({
   result,
   members,
+  links,
 }: {
   result: { race_name: string; division: string; overall_time: string | null; rank_overall: number | null; rank_age_group: number | null; age_group: string | null; gender: string | null; bib_number: string | null; gym_affiliate: string | null; league_points: number | null; total_gender: number | null; total_age_group: number | null; penalty: string | null; bonus: string | null; disqual_reason: string | null };
   members: string[];
+  links?: MemberLink[];
 }) {
   return (
     <section className="rounded-lg border border-tryka-navy-light bg-tryka-navy-light p-5 shadow-sm">
       <h1 className="text-2xl font-semibold tracking-tight">
-        {displayMembers(members)}
+        {links
+          ? links.map((m, i) => (
+              <span key={i}>
+                {i > 0 && " / "}
+                {m.slug ? (
+                  <Link href={`/athletes/${m.slug}`} className="hover:text-tryka-green hover:underline" title={`View ${stripCountry(m.name)}'s profile`}>
+                    {m.name}
+                  </Link>
+                ) : (
+                  m.name
+                )}
+              </span>
+            ))
+          : displayMembers(members)}
       </h1>
       <p className="mt-1 text-slate-400">
         {result.race_name} &middot; {result.division}

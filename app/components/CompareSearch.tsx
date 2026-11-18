@@ -47,7 +47,7 @@ export default function CompareSearch({
       setLoading(true);
       try {
         const res = await fetch(
-          `/api/search?q=${encodeURIComponent(trimmed)}`,
+          `/api/results-search?q=${encodeURIComponent(trimmed)}`,
           { signal: controller.signal },
         );
         if (res.ok) {

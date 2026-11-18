@@ -1,24 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { searchAthletes } from "@/lib/queries";
+import { searchAthletes } from "@/lib/athletes";
+import { claimedKeys } from "@/lib/claims";
+import { clientIp, createRateLimiter } from "@/lib/rateLimit";
 
-const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX = 60;
-const hits = new Map<string, { count: number; resetAt: number }>();
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = hits.get(ip);
-  if (!entry || now >= entry.resetAt) {
-    hits.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return false;
-  }
-  entry.count++;
-  return entry.count > RATE_LIMIT_MAX;
-}
+const isRateLimited = createRateLimiter(60, 60_000);
 
 export function GET(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-  if (isRateLimited(ip)) {
+  if (isRateLimited(clientIp(request.headers))) {
     return NextResponse.json(
       { error: "Too many requests" },
       { status: 429, headers: { "Retry-After": "60" } },
@@ -29,7 +17,8 @@ export function GET(request: NextRequest) {
   if (q.length < 3 || q.length > 200) {
     return NextResponse.json([]);
   }
-  return NextResponse.json(searchAthletes(q), {
-    headers: { "Cache-Control": "public, max-age=300, s-maxage=300" },
+  const claimed = claimedKeys();
+  return NextResponse.json(searchAthletes(q, (k) => claimed.has(k)), {
+    headers: { "Cache-Control": "public, max-age=60, s-maxage=60" },
   });
 }
