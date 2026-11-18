@@ -76,7 +76,6 @@ export default async function AthletePage({
       return { hit, memberIndex: e.memberIndex, partners };
     });
 
-  const races = new Set(rows.map((r) => r.hit.race_name));
   const bestByDivision = new Map<string, number>();
   for (const { hit } of rows) {
     const t = parseTime(hit.overall_time);
@@ -159,9 +158,8 @@ export default async function AthletePage({
         </div>
       </section>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-3 gap-3">
         <Tile label="Results" value={String(rows.length)} />
-        <Tile label="Races" value={String(races.size)} />
         <Tile label="Podiums" value={String(podiums)} />
         <Tile label="Divisions" value={String(new Set(rows.map((r) => r.hit.division)).size)} />
       </div>
@@ -191,6 +189,7 @@ export default async function AthletePage({
                   <th className="px-3 py-2">Race</th>
                   <th className="px-3 py-2">Division</th>
                   <th className="px-3 py-2">Partners</th>
+                  <th className="px-3 py-2">Gender</th>
                   <th className="px-3 py-2">Age Group</th>
                   <th className="px-3 py-2 text-right">Rank (M/W)</th>
                   <th className="px-3 py-2 text-right">Rank (Age)</th>
@@ -225,10 +224,8 @@ export default async function AthletePage({
                             </span>
                           ))}
                     </td>
-                    <td className="px-3 py-2">
-                      {hit.age_group ?? "—"}{" "}
-                      <span className="text-slate-500">{displayGender(hit.gender)}</span>
-                    </td>
+                    <td className="px-3 py-2">{displayGender(hit.gender)}</td>
+                    <td className="px-3 py-2">{hit.age_group ?? "—"}</td>
                     <td className="px-3 py-2 text-right tabular-nums">
                       {hit.rank_overall != null ? `${hit.rank_overall}/${hit.total_gender}` : "—"}
                     </td>
