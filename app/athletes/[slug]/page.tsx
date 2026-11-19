@@ -230,7 +230,7 @@ export default async function AthletePage({
                         {hit.race_name}
                       </Link>
                     </td>
-                    <td className="px-3 py-2">{hit.division}</td>
+                    <td className="px-3 py-2">{canonicalDivision(hit.division)}</td>
                     <td className="px-3 py-2">
                       {partners.length === 0
                         ? "—"
