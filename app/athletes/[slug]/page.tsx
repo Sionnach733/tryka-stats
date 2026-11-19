@@ -6,7 +6,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { getGroupEntries, getProfile, profileKeyForEntry, userKeys } from "@/lib/claims";
 import { canonicalDivision, getRefinedSplitsForResults, getResultsByIds, type SearchHit } from "@/lib/queries";
 import { bestStationTimes } from "@/lib/stationBests";
-import { countPodiums, displayGender, formatMmSs, parseMembers, parseTime } from "@/lib/format";
+import { bestTimesByDivision } from "@/lib/bestTimes";
+import { countPodiums, displayGender, formatMmSs, parseMembers } from "@/lib/format";
 import ClaimButton from "@/app/components/ClaimButton";
 import ManageResults, { type ManageRow } from "@/app/components/ManageResults";
 import AddResultSearch from "@/app/components/AddResultSearch";
@@ -77,14 +78,7 @@ export default async function AthletePage({
       return { hit, memberIndex: e.memberIndex, partners };
     });
 
-  const bestByDivision = new Map<string, number>();
-  for (const { hit } of rows) {
-    const t = parseTime(hit.overall_time);
-    if (t == null) continue;
-    const division = canonicalDivision(hit.division);
-    const prev = bestByDivision.get(division);
-    if (prev == null || t < prev) bestByDivision.set(division, t);
-  }
+  const bestTimes = bestTimesByDivision(rows.map((r) => r.hit));
   const bestStations = bestStationTimes(
     rows.map((r) => r.hit),
     getRefinedSplitsForResults(rows.map((r) => r.hit.id)),
@@ -170,15 +164,19 @@ export default async function AthletePage({
         <Tile label="Divisions" value={String(new Set(rows.map((r) => canonicalDivision(r.hit.division))).size)} />
       </div>
 
-      {bestByDivision.size > 0 && (
+      {bestTimes.length > 0 && (
         <section>
           <h2 className="text-lg font-semibold">Best times</h2>
           <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {Array.from(bestByDivision)
-              .sort(([a], [b]) => a.localeCompare(b))
-              .map(([division, t]) => (
-                <Tile key={division} label={division} value={formatHms(t)} />
-              ))}
+            {bestTimes.map((b) => (
+              <Tile
+                key={b.division}
+                label={b.division}
+                value={formatHms(b.seconds)}
+                caption={b.raceName}
+                href={`/results/${b.resultId}${q ? `?q=${encodeURIComponent(q)}` : ""}`}
+              />
+            ))}
           </div>
         </section>
       )}

@@ -46,3 +46,12 @@ test("profile invites logged-out visitors to log in to claim", async ({ page }) 
   await expect(page.getByRole("heading", { name: "Log in" })).toBeVisible();
   await expect(page.getByRole("button", { name: /sign-in link/ })).toBeVisible();
 });
+
+test("profile best times tiles link to the result", async ({ page }) => {
+  await page.goto("/athletes/emer-breen");
+  const tile = page.locator('section:has(h2:text-is("Best times")) a[href^="/results/"]').first();
+  await expect(tile).toBeVisible();
+  const href = await tile.getAttribute("href");
+  await tile.click();
+  await expect(page).toHaveURL(new RegExp(`${href}$`));
+});
