@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { getAthleteByKey, getAthleteBySlug, getResultMeta, stripCountry } from "@/lib/athletes";
 import { getCurrentUser } from "@/lib/auth";
 import { getGroupEntries, getProfile, profileKeyForEntry, userKeys } from "@/lib/claims";
-import { getRefinedSplitsForResults, getResultsByIds, type SearchHit } from "@/lib/queries";
+import { canonicalDivision, getRefinedSplitsForResults, getResultsByIds, type SearchHit } from "@/lib/queries";
 import { bestStationTimes } from "@/lib/stationBests";
 import { countPodiums, displayGender, formatMmSs, parseMembers, parseTime } from "@/lib/format";
 import ClaimButton from "@/app/components/ClaimButton";
@@ -81,8 +81,9 @@ export default async function AthletePage({
   for (const { hit } of rows) {
     const t = parseTime(hit.overall_time);
     if (t == null) continue;
-    const prev = bestByDivision.get(hit.division);
-    if (prev == null || t < prev) bestByDivision.set(hit.division, t);
+    const division = canonicalDivision(hit.division);
+    const prev = bestByDivision.get(division);
+    if (prev == null || t < prev) bestByDivision.set(division, t);
   }
   const bestStations = bestStationTimes(
     rows.map((r) => r.hit),
@@ -166,7 +167,7 @@ export default async function AthletePage({
       <div className="grid grid-cols-3 gap-3">
         <Tile label="Results" value={String(rows.length)} />
         <Tile label="Podiums" value={String(podiums)} />
-        <Tile label="Divisions" value={String(new Set(rows.map((r) => r.hit.division)).size)} />
+        <Tile label="Divisions" value={String(new Set(rows.map((r) => canonicalDivision(r.hit.division))).size)} />
       </div>
 
       {bestByDivision.size > 0 && (
