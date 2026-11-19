@@ -111,7 +111,7 @@ export default async function AthletePage({
           memberIndex: e.memberIndex,
           name: stripCountry(meta.members[e.memberIndex] ?? ""),
           raceName: meta.raceName,
-          division: meta.division,
+          division: canonicalDivision(meta.division),
           members: meta.members.map(stripCountry).join(" / "),
           overallTime: hit?.overall_time ?? null,
           status: e.status,
