@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 import { NextRequest, NextResponse } from "next/server";
 import { EMAIL_RE, appUrl, createLoginToken, normalizeEmail, safeNext } from "@/lib/auth";
+import { signInEmail } from "@/lib/authEmail";
 import { clientIp, createRateLimiter } from "@/lib/rateLimit";
 
 const ipLimited = createRateLimiter(10, 15 * 60_000);
@@ -40,13 +41,13 @@ export async function POST(req: NextRequest) {
   }
 
   const resend = new Resend(process.env.RESEND_API_KEY);
+  const { subject, html, text } = signInEmail(link);
   const { error } = await resend.emails.send({
     from: "Tryka Stats <noreply@trykastats.com>",
     to: email,
-    subject: "Your Tryka Stats sign-in link",
-    text:
-      `Click the link below to sign in to Tryka Stats. It expires in 15 minutes and can only be used once.\n\n` +
-      `${link}\n\nIf you didn't request this, you can ignore this email.`,
+    subject,
+    html,
+    text,
   });
   if (error) {
     console.error("[auth] Resend error:", error);
