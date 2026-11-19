@@ -23,6 +23,14 @@ describe("bestStationTimes", () => {
     expect(out).toEqual([]);
   });
 
+  it("skips Tryka Clan Fitness results", () => {
+    const out = bestStationTimes(
+      [{ id: 9, division: "TRYKA CLAN FITNESS", race_name: "Race D" }],
+      [{ result_id: 9, split_name: "Sled Pull", time: "00:02:00" }],
+    );
+    expect(out).toEqual([]);
+  });
+
   it("ignores impossibly fast times", () => {
     const out = bestStationTimes(results, [
       { result_id: 3, split_name: "Sled Push", time: "00:00:08" },

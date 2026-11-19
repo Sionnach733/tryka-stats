@@ -9,10 +9,13 @@ export type BestStation = {
   raceName: string;
 };
 
+// Divisions whose athletes may not have done every station.
+const EXCLUDED_DIVISIONS = new Set(["TRYKA RELAY", "TRYKA CLAN FITNESS"]);
+
 /**
  * Fastest valid time per workout station across the given results.
- * Relay results are skipped (a relay athlete may not have done the station) and
- * so are times below STATION_MIN_SECONDS. `results` should be newest first:
+ * Relay and Clan Fitness results are skipped (the athlete may not have done the
+ * station) and so are times below STATION_MIN_SECONDS. `results` should be newest first:
  * on a tie the newest result wins. Stations with no valid time are omitted.
  */
 export function bestStationTimes(
@@ -20,7 +23,7 @@ export function bestStationTimes(
   splits: { result_id: number; split_name: string; time: string | null }[],
 ): BestStation[] {
   const byId = new Map(
-    results.filter((r) => r.division !== "TRYKA RELAY").map((r, i) => [r.id, { ...r, i }]),
+    results.filter((r) => !EXCLUDED_DIVISIONS.has(r.division)).map((r, i) => [r.id, { ...r, i }]),
   );
   const best = new Map<string, BestStation & { i: number }>();
   for (const s of splits) {
