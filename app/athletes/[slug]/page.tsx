@@ -4,7 +4,8 @@ import type { Metadata } from "next";
 import { getAthleteByKey, getAthleteBySlug, getResultMeta, stripCountry } from "@/lib/athletes";
 import { getCurrentUser } from "@/lib/auth";
 import { getGroupEntries, getProfile, profileKeyForEntry, userKeys } from "@/lib/claims";
-import { getResultsByIds, type SearchHit } from "@/lib/queries";
+import { getRefinedSplitsForResults, getResultsByIds, type SearchHit } from "@/lib/queries";
+import { bestStationTimes } from "@/lib/stationBests";
 import { countPodiums, displayGender, formatMmSs, parseMembers, parseTime } from "@/lib/format";
 import ClaimButton from "@/app/components/ClaimButton";
 import ManageResults, { type ManageRow } from "@/app/components/ManageResults";
@@ -83,6 +84,10 @@ export default async function AthletePage({
     const prev = bestByDivision.get(hit.division);
     if (prev == null || t < prev) bestByDivision.set(hit.division, t);
   }
+  const bestStations = bestStationTimes(
+    rows.map((r) => r.hit),
+    getRefinedSplitsForResults(rows.map((r) => r.hit.id)),
+  );
   const podiums = countPodiums(rows.map((r) => r.hit));
 
   let manageRows: ManageRow[] = [];
@@ -177,6 +182,23 @@ export default async function AthletePage({
         </section>
       )}
 
+      {bestStations.length > 0 && (
+        <section>
+          <h2 className="text-lg font-semibold">Best station times</h2>
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {bestStations.map((b) => (
+              <Tile
+                key={b.station}
+                label={b.station}
+                value={formatMmSs(b.seconds)}
+                caption={`${b.raceName} · ${b.division.includes("DOUBLES") ? "Doubles" : b.division}`}
+                href={`/results/${b.resultId}?tab=stations${q ? `&q=${encodeURIComponent(q)}` : ""}`}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
       <section>
         <h2 className="text-lg font-semibold">Results</h2>
         {rows.length === 0 ? (
@@ -260,11 +282,30 @@ function formatHms(seconds: number): string {
   return `${String(h).padStart(2, "0")}:${formatMmSs(rest)}`;
 }
 
-function Tile({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-lg border border-tryka-navy-light bg-tryka-navy-light px-3 py-2.5 shadow-sm">
+function Tile({
+  label,
+  value,
+  caption,
+  href,
+}: {
+  label: string;
+  value: string;
+  caption?: string;
+  href?: string;
+}) {
+  const body = (
+    <>
       <div className="text-xs uppercase tracking-wide text-slate-400">{label}</div>
       <div className="mt-1 text-lg font-semibold tabular-nums">{value}</div>
-    </div>
+      {caption && <div className="mt-0.5 truncate text-xs text-slate-400">{caption}</div>}
+    </>
+  );
+  const cls = "rounded-lg border border-tryka-navy-light bg-tryka-navy-light px-3 py-2.5 shadow-sm";
+  return href ? (
+    <Link href={href} className={`block ${cls} hover:border-tryka-green`}>
+      {body}
+    </Link>
+  ) : (
+    <div className={cls}>{body}</div>
   );
 }
