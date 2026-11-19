@@ -9,6 +9,19 @@ export const WORKOUT_STATIONS = [
   "Burpees",
 ];
 
+// Splits faster than this are treated as data errors and ignored when picking
+// an athlete's best station time. Keep keys in sync with WORKOUT_STATIONS.
+export const STATION_MIN_SECONDS: Record<string, number> = {
+  SkiErg: 120,
+  "KB Farmers Carry": 20,
+  "Ramfit Thrusters": 70,
+  "Sled Push": 30,
+  "Sled Pull": 40,
+  Rowing: 100,
+  Lunges: 30,
+  Burpees: 50,
+};
+
 export const PACE_DISTANCES: Record<string, number> = {
   "TRYKA OPEN 800": 6.4,
   "TRYKA DOUBLES 800": 6.4,
