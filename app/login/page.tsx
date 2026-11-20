@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { safeNext } from "@/lib/auth";
 import LoginForm from "./LoginForm";
 
@@ -26,6 +27,13 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
       <div className="mt-6 rounded-lg border border-tryka-navy-light bg-tryka-navy-light px-4 py-4 shadow-sm">
         <LoginForm next={safeNext(next)} />
       </div>
+      <p className="mt-4 text-xs text-slate-400">
+        We store your email to sign you in. See our{" "}
+        <Link href="/privacy" className="underline hover:text-tryka-green">
+          privacy policy
+        </Link>
+        .
+      </p>
     </div>
   );
 }
