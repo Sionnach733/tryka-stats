@@ -30,6 +30,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly",
       priority: 0.2,
     },
+    {
+      url: "https://trykastats.com/terms",
+      changeFrequency: "yearly",
+      priority: 0.2,
+    },
     ...athleteUrls,
     ...resultUrls,
   ];
