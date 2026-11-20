@@ -85,6 +85,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/contact" className="hover:text-tryka-green transition-colors">
                 Contact
               </Link>
+              <span aria-hidden="true"> · </span>
+              <Link href="/privacy" className="hover:text-tryka-green transition-colors">
+                Privacy
+              </Link>
             </p>
             <a
               href={BMC_URL}

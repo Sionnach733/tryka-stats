@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import ContactForm from "./ContactForm";
 
 export const metadata: Metadata = {
@@ -20,6 +21,13 @@ export default function ContactPage() {
         </p>
       </header>
       <ContactForm />
+      <p className="mt-4 text-xs text-slate-400">
+        Your details are only used to reply to you. See our{" "}
+        <Link href="/privacy" className="underline hover:text-tryka-green">
+          privacy policy
+        </Link>
+        .
+      </p>
     </div>
   );
 }
