@@ -28,11 +28,15 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
         <LoginForm next={safeNext(next)} />
       </div>
       <p className="mt-4 text-xs text-slate-400">
-        We store your email to sign you in. See our{" "}
+        By signing in you agree to our{" "}
+        <Link href="/terms" className="underline hover:text-tryka-green">
+          terms
+        </Link>{" "}
+        and{" "}
         <Link href="/privacy" className="underline hover:text-tryka-green">
           privacy policy
         </Link>
-        .
+        . We store your email to sign you in.
       </p>
     </div>
   );
